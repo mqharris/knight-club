@@ -13,6 +13,11 @@ resources:
 
 namespace: knight-club
 
+configMapGenerator:
+  - name: mysql-init-sql
+    files:
+      - mysql/initdb.sql
+
 secretGenerator:
   - name: mysql-secrets
     behavior: create
