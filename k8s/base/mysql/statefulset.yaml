@@ -45,10 +45,10 @@ spec:
           - name: init-sql
             mountPath: /docker-entrypoint-initdb.d/initdb.sql
             subPath: initdb.sql
-          volumes:
-            - name: init-sql
-              configMap:
-                name: mysql-init-sql
+      volumes:
+        - name: init-sql
+          configMap:
+            name: mysql-init-sql
   volumeClaimTemplates:
     - metadata:
         name: data
