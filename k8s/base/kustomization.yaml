@@ -1,0 +1,25 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - namespace.yaml
+  - webui/deployment.yaml
+  - webui/service.yaml
+  - backend/deployment.yaml
+  - backend/service.yaml
+  - mysql/statefulset.yaml
+  - mysql/service.yaml
+  - webui/configmap.yaml
+
+namespace: knight-club
+
+secretGenerator:
+  - name: mysql-secrets
+    behavior: create
+    literals:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=knightclub
+      - MYSQL_USER=app
+      - MYSQL_PASSWORD=password
+generatorOptions:
+  disableNameSuffixHash: true
