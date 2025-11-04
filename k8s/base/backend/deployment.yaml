@@ -10,6 +10,8 @@ spec:
     metadata:
       labels: {app: backend}
     spec:
+      imagePullSecrets:
+        - name: ghcr-creds
       containers:
         - name: backend
           image: ghcr.io/mqharris/knight-club/backend:dev
