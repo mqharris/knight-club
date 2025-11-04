@@ -3,17 +3,17 @@
 
 USE knightclub;
 
--- Add current_hp column if it doesn't exist
+-- Add current_hp column
 ALTER TABLE knights 
-ADD COLUMN IF NOT EXISTS current_hp INT UNSIGNED NOT NULL DEFAULT 100;
+ADD COLUMN current_hp INT UNSIGNED NOT NULL DEFAULT 100;
 
--- Add max_hp column if it doesn't exist
+-- Add max_hp column
 ALTER TABLE knights 
-ADD COLUMN IF NOT EXISTS max_hp INT UNSIGNED NOT NULL DEFAULT 100;
+ADD COLUMN max_hp INT UNSIGNED NOT NULL DEFAULT 100;
 
--- Add is_alive column if it doesn't exist
+-- Add is_alive column
 ALTER TABLE knights 
-ADD COLUMN IF NOT EXISTS is_alive BOOLEAN NOT NULL DEFAULT TRUE;
+ADD COLUMN is_alive BOOLEAN NOT NULL DEFAULT TRUE;
 
 -- Verify the changes
 DESCRIBE knights;
