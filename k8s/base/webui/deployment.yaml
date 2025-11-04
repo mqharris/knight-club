@@ -12,16 +12,6 @@ spec:
     spec:
       containers:
         - name: webui
-          image: nginx:1.25-alpine
+          image: ghcr.io/mqharris/knight-club/webui:dev
           ports:
             - containerPort: 80
-          volumeMounts:
-            - name: webui-pages
-              mountPath: /usr/share/nginx/html
-      volumes:
-        - name: webui-pages
-          configMap:
-            name: webui-pages
-            items:
-              - key: index.html
-                path: index.html

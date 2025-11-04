@@ -3,9 +3,4 @@ kind: ConfigMap
 metadata:
   name: webui-pages
 data:
-  index.html: |
-    <!doctype html>
-    <html><head><meta charset="utf-8"><title>Knight Club</title></head>
-    <body style="font-family: sans-serif; text-align:center; margin-top:10vh;">
-      <h1>WELCOME TO KNIGHT-CLUB</h1>
-    </body></html>
+  index.html: ""

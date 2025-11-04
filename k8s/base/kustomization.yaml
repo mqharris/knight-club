@@ -9,7 +9,6 @@ resources:
   - backend/service.yaml
   - mysql/statefulset.yaml
   - mysql/service.yaml
-  - webui/configmap.yaml
 
 namespace: knight-club
 
