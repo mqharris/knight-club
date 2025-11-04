@@ -1,6 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: webui-pages
+  name: webui-config
+  namespace: knight-club
 data:
-  index.html: ""
+  API_BASE_URL: "http://64-23-234-139.nip.io/api"

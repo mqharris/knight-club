@@ -89,7 +89,7 @@
 </head>
 <body>
   <div class="container">
-    <h1>🛡️ KNIGHT CLUB</h1>
+    <h1>KNIGHT CLUB</h1>
     <div id="message"></div>
     <form id="authForm">
       <div class="form-group">
@@ -110,13 +110,11 @@
     let isLogin = true;
     const form = document.getElementById('authForm');
     const submitBtn = document.getElementById('submitBtn');
-    const switchLink = document.getElementById('switchLink');
     const switchText = document.getElementById('switchText');
     const messageDiv = document.getElementById('message');
 
-    switchLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      isLogin = !isLogin;
+    function setMode(loginMode) {
+      isLogin = loginMode;
       if (isLogin) {
         submitBtn.textContent = 'Login';
         switchText.innerHTML = 'Don\'t have an account? <a href="#" id="switchLink">Sign Up</a>';
@@ -124,9 +122,16 @@
         submitBtn.textContent = 'Sign Up';
         switchText.innerHTML = 'Already have an account? <a href="#" id="switchLink">Login</a>';
       }
+      document.getElementById('switchLink').addEventListener('click', switchMode);
+    }
+
+    function switchMode(e) {
+      e.preventDefault();
+      setMode(!isLogin);
       messageDiv.innerHTML = '';
-      document.getElementById('switchLink').addEventListener('click', arguments.callee);
-    });
+    }
+
+    document.getElementById('switchLink').addEventListener('click', switchMode);
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -135,7 +140,8 @@
       const endpoint = isLogin ? '/api/login' : '/api/signup';
 
       try {
-        const response = await fetch(`http://backend:8080${endpoint}`, {
+        // relative URL so it hits ingress on the same host
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ username, password })
@@ -144,18 +150,6 @@
         
         if (response.ok) {
           messageDiv.innerHTML = `<div class="message success">${data.message}</div>`;
-          if (isLogin) {
-            setTimeout(() => {
-              messageDiv.innerHTML = '<div class="message success">Welcome to Knight Club!</div>';
-            }, 1000);
-          } else {
-            setTimeout(() => {
-              isLogin = true;
-              submitBtn.textContent = 'Login';
-              switchText.innerHTML = 'Don\'t have an account? <a href="#" id="switchLink">Sign Up</a>';
-              document.getElementById('switchLink').addEventListener('click', switchLink.onclick);
-            }, 1500);
-          }
         } else {
           messageDiv.innerHTML = `<div class="message error">${data.error}</div>`;
         }
@@ -163,6 +157,9 @@
         messageDiv.innerHTML = `<div class="message error">Connection error. Please try again.</div>`;
       }
     });
+
+    // init
+    setMode(true);
   </script>
 </body>
 </html>
