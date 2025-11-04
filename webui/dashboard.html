@@ -170,7 +170,10 @@
       }
 
       container.innerHTML = knights.map(knight => `
-        <div style="background: #f5f7fa; padding: 20px; border-radius: 8px; margin-bottom: 15px;">
+        <div style="background: #f5f7fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s;" 
+             onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+             onclick="window.location.href='/knight.html?id=${knight.id}'">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
               <h3 style="margin: 0 0 10px 0; color: #333;">${knight.name}</h3>
@@ -178,6 +181,7 @@
               <p style="margin: 5px 0; color: #666;"><strong>Level:</strong> ${knight.level}</p>
               <p style="margin: 5px 0; color: #666;"><strong>Age:</strong> ${calculateAge(knight.created_at)}</p>
             </div>
+            <div style="color: #667eea; font-size: 24px;">→</div>
           </div>
         </div>
       `).join('');

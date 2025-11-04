@@ -100,6 +100,26 @@ def get_knights():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/knights/<int:knight_id>', methods=['GET'])
+def get_knight(knight_id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT id, user_id, name, class, level, created_at FROM knights WHERE id = %s",
+            (knight_id,)
+        )
+        knight = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if not knight:
+            return jsonify({'error': 'Knight not found'}), 404
+        
+        return jsonify({'knight': knight}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/knights', methods=['POST'])
 def create_knight():
     data = request.json

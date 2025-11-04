@@ -1,0 +1,340 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Knight Club - Knight Details</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .navbar {
+      background: white;
+      padding: 15px 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .navbar h1 {
+      margin: 0;
+      color: #333;
+      font-size: 24px;
+    }
+    .navbar .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .navbar button {
+      padding: 8px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .knight-header {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .knight-info h2 {
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+    .knight-info p {
+      margin: 5px 0;
+      color: #666;
+    }
+    .battle-btn {
+      padding: 15px 40px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 18px;
+      box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+    }
+    .battle-btn:hover {
+      background: #c0392b;
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .card h3 {
+      margin: 0 0 20px 0;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    .equipment-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .equipment-slot {
+      background: #f5f7fa;
+      padding: 15px;
+      border-radius: 5px;
+      border: 2px solid #ddd;
+    }
+    .equipment-slot.empty {
+      opacity: 0.6;
+    }
+    .slot-name {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 5px;
+      text-transform: capitalize;
+    }
+    .slot-item {
+      color: #666;
+      font-size: 14px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .stat-item {
+      background: #f5f7fa;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .stat-label {
+      font-weight: 600;
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    .stat-value {
+      font-size: 24px;
+      color: #667eea;
+      font-weight: 700;
+    }
+    .hp-bar {
+      background: #f5f7fa;
+      padding: 20px;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+    .hp-label {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .hp-bar-container {
+      background: #ddd;
+      height: 30px;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    .hp-bar-fill {
+      background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+      height: 100%;
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🛡️ KNIGHT CLUB</h1>
+    <div class="nav-links">
+      <a href="/dashboard.html">← Back to Dashboard</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="knight-header">
+      <div class="knight-info" id="knightInfo">
+        <h2 id="knightName">Loading...</h2>
+        <p><strong>Class:</strong> <span id="knightClass"></span></p>
+        <p><strong>Level:</strong> <span id="knightLevel"></span></p>
+        <p><strong>Age:</strong> <span id="knightAge"></span></p>
+      </div>
+      <button class="battle-btn" onclick="startBattle()">⚔️ BATTLE</button>
+    </div>
+
+    <div class="main-grid">
+      <div class="card">
+        <h3>Equipment</h3>
+        <div class="equipment-grid" id="equipmentGrid"></div>
+      </div>
+
+      <div class="card">
+        <h3>Stats</h3>
+        <div class="stats-grid" id="statsGrid"></div>
+        
+        <div class="hp-bar">
+          <div class="hp-label">
+            <span>Hit Points</span>
+            <span id="hpText">100 / 100</span>
+          </div>
+          <div class="hp-bar-container">
+            <div class="hp-bar-fill" id="hpBarFill" style="width: 100%;">
+              100%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    const user = JSON.parse(localStorage.getItem('knightclub_user') || 'null');
+    if (!user) {
+      window.location.href = '/';
+    }
+
+    // Get knight ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const knightId = urlParams.get('id');
+    if (!knightId) {
+      window.location.href = '/dashboard.html';
+    }
+
+    let knightData = null;
+
+    // Equipment slots
+    const equipmentSlots = [
+      'helm', 'chest', 'cape', 'belt', 
+      'gloves', 'pants', 'boots', 'ring', 'ring'
+    ];
+
+    // Base stats
+    const stats = {
+      strength: 10,
+      defense: 10,
+      agility: 10,
+      intelligence: 10
+    };
+
+    function logout() {
+      localStorage.removeItem('knightclub_user');
+      window.location.href = '/';
+    }
+
+    async function loadKnight() {
+      try {
+        const response = await fetch(`/api/knights/${knightId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          knightData = data.knight;
+          displayKnight();
+        } else {
+          alert('Failed to load knight');
+          window.location.href = '/dashboard.html';
+        }
+      } catch (error) {
+        alert('Connection error');
+        window.location.href = '/dashboard.html';
+      }
+    }
+
+    function displayKnight() {
+      document.getElementById('knightName').textContent = knightData.name;
+      document.getElementById('knightClass').textContent = knightData.class;
+      document.getElementById('knightLevel').textContent = knightData.level;
+      document.getElementById('knightAge').textContent = calculateAge(knightData.created_at);
+      
+      displayEquipment();
+      displayStats();
+      displayHP();
+    }
+
+    function calculateAge(created_at) {
+      const created = new Date(created_at);
+      const now = new Date();
+      const days = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+      
+      if (days === 0) return 'Less than 1 day';
+      if (days === 1) return '1 day';
+      return `${days} days`;
+    }
+
+    function displayEquipment() {
+      const container = document.getElementById('equipmentGrid');
+      
+      container.innerHTML = equipmentSlots.map((slot, index) => {
+        const slotName = slot === 'ring' ? `Ring ${index === 7 ? '1' : '2'}` : slot;
+        return `
+          <div class="equipment-slot empty">
+            <div class="slot-name">${slotName}</div>
+            <div class="slot-item">Empty</div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function displayStats() {
+      const container = document.getElementById('statsGrid');
+      
+      container.innerHTML = Object.entries(stats).map(([stat, value]) => `
+        <div class="stat-item">
+          <div class="stat-label">${stat.charAt(0).toUpperCase() + stat.slice(1)}</div>
+          <div class="stat-value">${value}</div>
+        </div>
+      `).join('');
+    }
+
+    function displayHP() {
+      const currentHP = 100;
+      const maxHP = 100;
+      const percentage = (currentHP / maxHP) * 100;
+      
+      document.getElementById('hpText').textContent = `${currentHP} / ${maxHP}`;
+      document.getElementById('hpBarFill').style.width = `${percentage}%`;
+      document.getElementById('hpBarFill').textContent = `${Math.round(percentage)}%`;
+    }
+
+    function startBattle() {
+      alert('Battle system coming soon!');
+      // TODO: Implement battle system
+    }
+
+    // Load knight on page load
+    loadKnight();
+  </script>
+</body>
+</html>
