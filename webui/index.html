@@ -150,6 +150,23 @@
         
         if (response.ok) {
           messageDiv.innerHTML = `<div class="message success">${data.message}</div>`;
+          
+          if (isLogin) {
+            // Save user info and redirect to dashboard
+            localStorage.setItem('knightclub_user', JSON.stringify({
+              username: username,
+              user_id: data.user_id
+            }));
+            setTimeout(() => {
+              window.location.href = '/dashboard.html';
+            }, 1000);
+          } else {
+            // After signup, switch to login mode
+            setTimeout(() => {
+              setMode(true);
+              messageDiv.innerHTML = '<div class="message success">Account created! Please log in.</div>';
+            }, 1500);
+          }
         } else {
           messageDiv.innerHTML = `<div class="message error">${data.error}</div>`;
         }

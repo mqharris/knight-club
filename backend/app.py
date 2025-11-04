@@ -79,5 +79,70 @@ def login():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/knights', methods=['GET'])
+def get_knights():
+    user_id = request.args.get('user_id')
+    
+    if not user_id:
+        return jsonify({'error': 'user_id required'}), 400
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute(
+            "SELECT id, name, class, level, created_at FROM knights WHERE user_id = %s ORDER BY created_at DESC",
+            (user_id,)
+        )
+        knights = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify({'knights': knights}), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/knights', methods=['POST'])
+def create_knight():
+    data = request.json
+    user_id = data.get('user_id')
+    name = data.get('name')
+    knight_class = data.get('class')
+    
+    if not user_id or not name or not knight_class:
+        return jsonify({'error': 'user_id, name, and class required'}), 400
+    
+    if knight_class not in ['knight', 'paladin', 'lancer', 'templar']:
+        return jsonify({'error': 'Invalid class'}), 400
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Check if all existing knights are level 10
+        cursor.execute(
+            "SELECT level FROM knights WHERE user_id = %s",
+            (user_id,)
+        )
+        existing_knights = cursor.fetchall()
+        
+        if existing_knights and not all(k['level'] >= 10 for k in existing_knights):
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'All knights must be level 10 before creating a new one'}), 400
+        
+        # Create the knight
+        cursor.execute(
+            "INSERT INTO knights (user_id, name, class, level) VALUES (%s, %s, %s, 1)",
+            (user_id, name, knight_class)
+        )
+        conn.commit()
+        knight_id = cursor.lastrowid
+        cursor.close()
+        conn.close()
+        return jsonify({'message': 'Knight created', 'knight_id': knight_id}), 201
+    except mysql.connector.IntegrityError:
+        return jsonify({'error': 'Knight name already exists for this user'}), 409
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080)
