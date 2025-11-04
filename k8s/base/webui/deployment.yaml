@@ -15,5 +15,6 @@ spec:
       containers:
         - name: webui
           image: ghcr.io/mqharris/knight-club/webui:dev
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
