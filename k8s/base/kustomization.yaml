@@ -9,6 +9,7 @@ resources:
   - backend/service.yaml
   - mysql/statefulset.yaml
   - mysql/service.yaml
+  - ingress.yaml
 
 namespace: knight-club
 
