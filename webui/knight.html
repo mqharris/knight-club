@@ -59,6 +59,17 @@
       justify-content: space-between;
       align-items: center;
     }
+    .knight-header-left {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .knight-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 10px;
+      border: 3px solid #667eea;
+    }
     .knight-info h2 {
       margin: 0 0 10px 0;
       color: #333;
@@ -185,11 +196,14 @@
 
   <div class="content">
     <div class="knight-header">
-      <div class="knight-info" id="knightInfo">
-        <h2 id="knightName">Loading...</h2>
-        <p><strong>Class:</strong> <span id="knightClass"></span></p>
-        <p><strong>Level:</strong> <span id="knightLevel"></span></p>
-        <p><strong>Age:</strong> <span id="knightAge"></span></p>
+      <div class="knight-header-left">
+        <img id="knightAvatar" class="knight-avatar" src="" alt="Knight">
+        <div class="knight-info" id="knightInfo">
+          <h2 id="knightName">Loading...</h2>
+          <p><strong>Class:</strong> <span id="knightClass"></span></p>
+          <p><strong>Level:</strong> <span id="knightLevel"></span></p>
+          <p><strong>Age:</strong> <span id="knightAge"></span></p>
+        </div>
       </div>
       <button class="battle-btn" onclick="startBattle()">⚔️ BATTLE</button>
     </div>
@@ -277,6 +291,7 @@
       document.getElementById('knightClass').textContent = knightData.class;
       document.getElementById('knightLevel').textContent = knightData.level;
       document.getElementById('knightAge').textContent = calculateAge(knightData.created_at);
+      document.getElementById('knightAvatar').src = `/images/${knightData.class}.svg`;
       
       displayEquipment();
       displayStats();
