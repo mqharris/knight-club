@@ -3,6 +3,8 @@ from flask_cors import CORS
 import mysql.connector
 import bcrypt
 import os
+from monsters import get_monster
+from battle import simulate_battle
 
 app = Flask(__name__)
 CORS(app)
@@ -90,7 +92,7 @@ def get_knights():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "SELECT id, name, class, level, created_at FROM knights WHERE user_id = %s ORDER BY created_at DESC",
+            "SELECT id, name, class, level, current_hp, max_hp, is_alive, created_at FROM knights WHERE user_id = %s ORDER BY is_alive DESC, created_at DESC",
             (user_id,)
         )
         knights = cursor.fetchall()
@@ -106,7 +108,7 @@ def get_knight(knight_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "SELECT id, user_id, name, class, level, created_at FROM knights WHERE id = %s",
+            "SELECT id, user_id, name, class, level, current_hp, max_hp, is_alive, created_at FROM knights WHERE id = %s",
             (knight_id,)
         )
         knight = cursor.fetchone()
@@ -137,17 +139,17 @@ def create_knight():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # Check if all existing knights are level 10
+        # Check if all existing LIVING knights are level 10
         cursor.execute(
-            "SELECT level FROM knights WHERE user_id = %s",
+            "SELECT level FROM knights WHERE user_id = %s AND is_alive = TRUE",
             (user_id,)
         )
-        existing_knights = cursor.fetchall()
+        living_knights = cursor.fetchall()
         
-        if existing_knights and not all(k['level'] >= 10 for k in existing_knights):
+        if living_knights and not all(k['level'] >= 10 for k in living_knights):
             cursor.close()
             conn.close()
-            return jsonify({'error': 'All knights must be level 10 before creating a new one'}), 400
+            return jsonify({'error': 'All living knights must be level 10 before creating a new one'}), 400
         
         # Create the knight
         cursor.execute(
@@ -161,6 +163,97 @@ def create_knight():
         return jsonify({'message': 'Knight created', 'knight_id': knight_id}), 201
     except mysql.connector.IntegrityError:
         return jsonify({'error': 'Knight name already exists for this user'}), 409
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/battle', methods=['POST'])
+def start_battle():
+    data = request.json
+    knight_id = data.get('knight_id')
+    difficulty = data.get('difficulty', 'easy')
+    
+    if not knight_id:
+        return jsonify({'error': 'knight_id required'}), 400
+    
+    if difficulty not in ['easy', 'medium', 'hard']:
+        return jsonify({'error': 'Invalid difficulty'}), 400
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get knight data
+        cursor.execute(
+            "SELECT id, user_id, name, class, level, current_hp, max_hp FROM knights WHERE id = %s",
+            (knight_id,)
+        )
+        knight = cursor.fetchone()
+        
+        if not knight:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Knight not found'}), 404
+        
+        # Check if knight has enough HP to battle
+        if knight['current_hp'] <= 0:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Knight has no HP remaining'}), 400
+        
+        # Get monster
+        monster = get_monster(difficulty)
+        
+        # Simulate battle
+        battle_result = simulate_battle(knight, monster)
+        
+        # Update knight HP and alive status
+        cursor.execute(
+            "UPDATE knights SET current_hp = %s, is_alive = %s WHERE id = %s",
+            (battle_result['knight_hp'], battle_result['knight_alive'], knight_id)
+        )
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'result': battle_result['result'],
+            'knight_hp': battle_result['knight_hp'],
+            'knight_max_hp': knight['max_hp'],
+            'knight_alive': battle_result['knight_alive'],
+            'log': battle_result['log'],
+            'xp_gained': battle_result['xp_gained']
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/regen', methods=['POST'])
+def regen_hp():
+    """
+    Regenerate HP for all knights (1 HP per 15 minutes).
+    Called by K8s CronJob.
+    """
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Heal all knights by 1 HP, up to their max_hp
+        cursor.execute("""
+            UPDATE knights 
+            SET current_hp = LEAST(current_hp + 1, max_hp)
+            WHERE current_hp < max_hp
+        """)
+        
+        healed_count = cursor.rowcount
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'message': f'Healed {healed_count} knights',
+            'healed_count': healed_count
+        }), 200
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

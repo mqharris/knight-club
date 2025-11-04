@@ -287,11 +287,23 @@
     }
 
     function displayKnight() {
-      document.getElementById('knightName').textContent = knightData.name;
+      const isDead = !knightData.is_alive;
+      
+      document.getElementById('knightName').textContent = knightData.name + (isDead ? ' 💀' : '');
       document.getElementById('knightClass').textContent = knightData.class;
       document.getElementById('knightLevel').textContent = knightData.level;
       document.getElementById('knightAge').textContent = calculateAge(knightData.created_at);
       document.getElementById('knightAvatar').src = `/images/${knightData.class}.svg`;
+      
+      // Grey out and disable if dead
+      if (isDead) {
+        document.querySelector('.knight-header').style.opacity = '0.6';
+        document.querySelector('.knight-header').style.filter = 'grayscale(100%)';
+        document.querySelector('.battle-btn').disabled = true;
+        document.querySelector('.battle-btn').style.background = '#999';
+        document.querySelector('.battle-btn').style.cursor = 'not-allowed';
+        document.querySelector('.battle-btn').textContent = '⚰️ DECEASED';
+      }
       
       displayEquipment();
       displayStats();
@@ -334,8 +346,8 @@
     }
 
     function displayHP() {
-      const currentHP = 100;
-      const maxHP = 100;
+      const currentHP = knightData.current_hp;
+      const maxHP = knightData.max_hp;
       const percentage = (currentHP / maxHP) * 100;
       
       document.getElementById('hpText').textContent = `${currentHP} / ${maxHP}`;
@@ -344,8 +356,66 @@
     }
 
     function startBattle() {
-      alert('Battle system coming soon!');
-      // TODO: Implement battle system
+      if (!knightData.is_alive) {
+        alert('This knight has fallen and cannot battle.');
+        return;
+      }
+      
+      if (knightData.current_hp <= 0) {
+        alert('Knight has no HP! Wait for regeneration.');
+        return;
+      }
+      
+      // Simple difficulty selector (only Easy for now)
+      const difficulty = 'easy';
+      
+      if (!confirm(`Send ${knightData.name} into battle? (Difficulty: Easy - Level 1 Slime)`)) {
+        return;
+      }
+      
+      // Disable button during battle
+      const battleBtn = document.querySelector('.battle-btn');
+      battleBtn.disabled = true;
+      battleBtn.textContent = '⚔️ BATTLING...';
+      
+      fetch('/api/battle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          knight_id: knightId,
+          difficulty: difficulty
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        battleBtn.disabled = false;
+        battleBtn.textContent = '⚔️ BATTLE';
+        
+        if (data.error) {
+          alert('Battle error: ' + data.error);
+          return;
+        }
+        
+        // Show battle log
+        const logText = data.log.join('\n');
+        alert(`BATTLE RESULTS:\n\n${logText}`);
+        
+        // Update knight HP and alive status
+        knightData.current_hp = data.knight_hp;
+        knightData.is_alive = data.knight_alive;
+        
+        // If knight died, update display
+        if (!data.knight_alive) {
+          displayKnight(); // Re-render with death state
+        } else {
+          displayHP(); // Just update HP bar
+        }
+      })
+      .catch(error => {
+        battleBtn.disabled = false;
+        battleBtn.textContent = '⚔️ BATTLE';
+        alert('Connection error: ' + error);
+      });
     }
 
     // Load knight on page load

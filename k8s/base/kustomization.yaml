@@ -9,6 +9,7 @@ resources:
   - backend/service.yaml
   - mysql/statefulset.yaml
   - mysql/service.yaml
+  - cronjob-hp-regen.yaml
   - ingress.yaml
 
 namespace: knight-club

@@ -169,22 +169,31 @@
         return;
       }
 
-      container.innerHTML = knights.map(knight => `
-        <div style="background: #f5f7fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s;" 
+      container.innerHTML = knights.map(knight => {
+        const isDead = !knight.is_alive;
+        const greyStyle = isDead ? 'opacity: 0.5; filter: grayscale(100%);' : '';
+        const statusBadge = isDead ? '<span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">DECEASED</span>' : '';
+        
+        return `
+        <div style="background: #f5f7fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s; ${greyStyle}" 
              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
              onclick="window.location.href='/knight.html?id=${knight.id}'">
           <div style="display: flex; justify-content: space-between; align-items: center;">
             <div>
-              <h3 style="margin: 0 0 10px 0; color: #333;">${knight.name}</h3>
+              <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #333;">${knight.name}</h3>
+                ${statusBadge}
+              </div>
               <p style="margin: 5px 0; color: #666;"><strong>Class:</strong> ${knight.class}</p>
               <p style="margin: 5px 0; color: #666;"><strong>Level:</strong> ${knight.level}</p>
               <p style="margin: 5px 0; color: #666;"><strong>Age:</strong> ${calculateAge(knight.created_at)}</p>
+              ${isDead ? '<p style="margin: 5px 0; color: #e74c3c;"><strong>HP:</strong> 0 / ' + knight.max_hp + '</p>' : '<p style="margin: 5px 0; color: #666;"><strong>HP:</strong> ' + knight.current_hp + ' / ' + knight.max_hp + '</p>'}
             </div>
             <div style="color: #667eea; font-size: 24px;">→</div>
           </div>
         </div>
-      `).join('');
+      `}).join('');
     }
 
     function calculateAge(created_at) {
@@ -199,13 +208,14 @@
 
     function updateCreateButton() {
       const btn = document.getElementById('createKnightBtn');
-      const allLevel10 = knights.length > 0 && knights.every(k => k.level >= 10);
+      const livingKnights = knights.filter(k => k.is_alive);
+      const allLevel10 = livingKnights.length > 0 && livingKnights.every(k => k.level >= 10);
       
-      if (knights.length > 0 && !allLevel10) {
+      if (livingKnights.length > 0 && !allLevel10) {
         btn.disabled = true;
         btn.style.background = '#ccc';
         btn.style.cursor = 'not-allowed';
-        btn.textContent = 'All knights must be level 10 to create a new one';
+        btn.textContent = 'All living knights must be level 10 to create a new one';
       } else {
         btn.disabled = false;
         btn.style.background = '#667eea';
