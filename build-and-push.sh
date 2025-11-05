@@ -6,20 +6,8 @@ REGISTRY="ghcr.io"
 OWNER="mqharris"
 REPO="knight-club"
 TAG="${1:-dev}"
-COMMIT_MSG="${2:-Update code}"
 
 echo "🔨 Building and pushing images for knight-club (tag: $TAG)"
-echo ""
-
-# Git commit and push
-echo "📝 Committing changes..."
-git add .
-git commit -m "$COMMIT_MSG" || echo "No changes to commit"
-echo ""
-
-echo "⬆️  Pushing to git..."
-git push || echo "Nothing to push or push failed"
-echo "✅ Git push complete"
 echo ""
 
 # Build and push backend

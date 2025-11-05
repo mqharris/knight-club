@@ -500,6 +500,10 @@ def start_battle():
         # Simulate battle
         battle_result = simulate_battle(knight, monster)
         
+        # Initialize exp and level for response
+        new_exp = knight['exp']
+        new_level = knight['level']
+        
         # Update knight HP, alive status, and XP if victorious
         if battle_result['result'] == 'victory':
             new_exp = knight['exp'] + battle_result['xp_gained']
@@ -558,8 +562,8 @@ def start_battle():
             'knight_alive': battle_result['knight_alive'],
             'log': battle_result['log'],
             'xp_gained': battle_result['xp_gained'],
-            'exp': battle_result['exp'],
-            'level': battle_result['level'],
+            'exp': new_exp,
+            'level': new_level,
             'loot': battle_result.get('loot', {'gold': 0, 'items': []})
         }), 200
         
