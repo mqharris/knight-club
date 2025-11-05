@@ -209,13 +209,15 @@ def start_battle():
         # Update knight HP, alive status, and XP if victorious
         if battle_result['result'] == 'victory':
             new_exp = knight['exp'] + battle_result['xp_gained']
+            new_level = (new_exp // 100) + 1  # Level up every 100 XP
             
             cursor.execute(
-                "UPDATE knights SET current_hp = %s, is_alive = %s, exp = %s WHERE id = %s",
-                (battle_result['knight_hp'], battle_result['knight_alive'], new_exp, knight_id)
+                "UPDATE knights SET current_hp = %s, is_alive = %s, exp = %s, level = %s WHERE id = %s",
+                (battle_result['knight_hp'], battle_result['knight_alive'], new_exp, new_level, knight_id)
             )
             
             battle_result['exp'] = new_exp
+            battle_result['level'] = new_level
         else:
             cursor.execute(
                 "UPDATE knights SET current_hp = %s, is_alive = %s WHERE id = %s",
@@ -223,6 +225,7 @@ def start_battle():
             )
             
             battle_result['exp'] = knight['exp']
+            battle_result['level'] = knight['level']
         
         conn.commit()
         cursor.close()
@@ -235,7 +238,8 @@ def start_battle():
             'knight_alive': battle_result['knight_alive'],
             'log': battle_result['log'],
             'xp_gained': battle_result['xp_gained'],
-            'exp': battle_result['exp']
+            'exp': battle_result['exp'],
+            'level': battle_result['level']
         }), 200
         
     except Exception as e:
