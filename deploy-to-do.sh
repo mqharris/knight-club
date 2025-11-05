@@ -9,7 +9,7 @@ echo ""
 
 # Pull latest code
 echo "📥 Pulling latest code from git..."
-git pull origin k8s-init
+git pull origin $(git branch --show-current)
 echo "✅ Code updated"
 echo ""
 
