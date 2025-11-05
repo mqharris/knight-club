@@ -92,7 +92,7 @@ def get_knights():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "SELECT id, name, class, level, current_hp, max_hp, is_alive, created_at FROM knights WHERE user_id = %s ORDER BY is_alive DESC, created_at DESC",
+            "SELECT id, name, class, level, exp, current_hp, max_hp, is_alive, created_at FROM knights WHERE user_id = %s ORDER BY is_alive DESC, created_at DESC",
             (user_id,)
         )
         knights = cursor.fetchall()
@@ -108,7 +108,7 @@ def get_knight(knight_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         cursor.execute(
-            "SELECT id, user_id, name, class, level, current_hp, max_hp, is_alive, created_at FROM knights WHERE id = %s",
+            "SELECT id, user_id, name, class, level, exp, current_hp, max_hp, is_alive, created_at FROM knights WHERE id = %s",
             (knight_id,)
         )
         knight = cursor.fetchone()
@@ -184,7 +184,7 @@ def start_battle():
         
         # Get knight data
         cursor.execute(
-            "SELECT id, user_id, name, class, level, current_hp, max_hp FROM knights WHERE id = %s",
+            "SELECT id, user_id, name, class, level, exp, current_hp, max_hp FROM knights WHERE id = %s",
             (knight_id,)
         )
         knight = cursor.fetchone()
@@ -206,11 +206,20 @@ def start_battle():
         # Simulate battle
         battle_result = simulate_battle(knight, monster)
         
-        # Update knight HP and alive status
-        cursor.execute(
-            "UPDATE knights SET current_hp = %s, is_alive = %s WHERE id = %s",
-            (battle_result['knight_hp'], battle_result['knight_alive'], knight_id)
-        )
+        # Update knight HP, alive status, and XP if victorious
+        if battle_result['result'] == 'victory':
+            new_exp = knight['exp'] + battle_result['xp_gained']
+            
+            cursor.execute(
+                "UPDATE knights SET current_hp = %s, is_alive = %s, exp = %s WHERE id = %s",
+                (battle_result['knight_hp'], battle_result['knight_alive'], new_exp, knight_id)
+            )
+        else:
+            cursor.execute(
+                "UPDATE knights SET current_hp = %s, is_alive = %s WHERE id = %s",
+                (battle_result['knight_hp'], battle_result['knight_alive'], knight_id)
+            )
+        
         conn.commit()
         cursor.close()
         conn.close()

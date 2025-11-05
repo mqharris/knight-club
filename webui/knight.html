@@ -229,6 +229,13 @@
             </div>
           </div>
         </div>
+        
+        <div class="hp-bar">
+          <div class="hp-label">
+            <span>Experience</span>
+            <span id="expText">0 XP</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -308,6 +315,7 @@
       displayEquipment();
       displayStats();
       displayHP();
+      displayExp();
     }
 
     function calculateAge(created_at) {
@@ -353,6 +361,11 @@
       document.getElementById('hpText').textContent = `${currentHP} / ${maxHP}`;
       document.getElementById('hpBarFill').style.width = `${percentage}%`;
       document.getElementById('hpBarFill').textContent = `${Math.round(percentage)}%`;
+    }
+
+    function displayExp() {
+      const exp = knightData.exp || 0;
+      document.getElementById('expText').textContent = `${exp} XP`;
     }
 
     function startBattle() {

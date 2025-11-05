@@ -189,6 +189,7 @@
               <p style="margin: 5px 0; color: #666;"><strong>Level:</strong> ${knight.level}</p>
               <p style="margin: 5px 0; color: #666;"><strong>Age:</strong> ${calculateAge(knight.created_at)}</p>
               ${isDead ? '<p style="margin: 5px 0; color: #e74c3c;"><strong>HP:</strong> 0 / ' + knight.max_hp + '</p>' : '<p style="margin: 5px 0; color: #666;"><strong>HP:</strong> ' + knight.current_hp + ' / ' + knight.max_hp + '</p>'}
+              ${isDead ? '' : '<p style="margin: 5px 0; color: #666;"><strong>XP:</strong> ' + (knight.exp || 0) + '</p>'}
             </div>
             <div style="color: #667eea; font-size: 24px;">→</div>
           </div>

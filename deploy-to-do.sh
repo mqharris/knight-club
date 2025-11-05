@@ -43,4 +43,9 @@ echo ""
 
 echo "🎉 Deployment complete!"
 echo ""
-echo "Access your app at: http://$(curl -s ifconfig.me):30080"
+IP=$(curl -s ifconfig.me)
+NIP_IO=$(echo $IP | tr '.' '-')
+echo "Access your app at:"
+echo "  NodePort: http://$IP:30080"
+echo "  Ingress:  http://$NIP_IO.nip.io"
+
