@@ -50,7 +50,7 @@ def add_item_to_inventory(cursor, user_id, item_id, quantity=1):
             cursor.execute("""
                 UPDATE inventory SET quantity = quantity + %s 
                 WHERE id = %s
-            """, (quantity, existing[0]))
+            """, (quantity, existing['id']))
         else:
             # Create new stack
             cursor.execute("""
