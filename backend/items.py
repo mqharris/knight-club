@@ -47,6 +47,15 @@ ITEMS = {
         "description": "Wooden planks strapped together as armor (step aside macgyver)",
         "rarity": "uncommon"
     },
+    205: {
+        "name": "Wooden Pants",
+        "type": "armor",
+        "stackable": False,
+        "slot": "pants",
+        "stats": {"defense": 3},
+        "description": "Wooden leg armor (what? you want me to stand inside this wooden box?)",
+        "rarity": "uncommon"
+    },
 }
 
 def get_item(item_id):

@@ -556,7 +556,10 @@ def start_battle():
         }), 200
         
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        import traceback
+        print(f"Battle error: {e}")
+        print(traceback.format_exc())
+        return jsonify({'error': str(e) if str(e) else 'Unknown error occurred'}), 500
 
 @app.route('/api/regen', methods=['POST'])
 def regen_hp():
