@@ -4,12 +4,22 @@ import mysql.connector
 import bcrypt
 import os
 import random
+import sys
+import logging
 from monsters import get_monster
 from battle import simulate_battle
 from items import get_item
 
 app = Flask(__name__)
 CORS(app)
+
+# Configure logging to stderr
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[logging.StreamHandler(sys.stderr)]
+)
+logger = logging.getLogger(__name__)
 
 def get_db_connection():
     return mysql.connector.connect(
@@ -496,28 +506,28 @@ def start_battle():
         
         # Get monster
         monster = get_monster(difficulty)
-        print(f"[BATTLE] Monster: {monster.name}, Difficulty: {difficulty}")
+        logger.info(f"[BATTLE] Monster: {monster.name}, Difficulty: {difficulty}")
         
         # Simulate battle
         battle_result = simulate_battle(knight, monster)
-        print(f"[BATTLE] Battle result: {battle_result.get('result')}")
-        print(f"[BATTLE] Battle result keys: {list(battle_result.keys())}")
+        logger.info(f"[BATTLE] Battle result: {battle_result.get('result')}")
+        logger.info(f"[BATTLE] Battle result keys: {list(battle_result.keys())}")
         
         # Initialize exp and level for response
         new_exp = knight['exp']
         new_level = knight['level']
-        print(f"[BATTLE] Initial exp: {new_exp}, level: {new_level}")
+        logger.info(f"[BATTLE] Initial exp: {new_exp}, level: {new_level}")
         
         # Update knight HP, alive status, and XP if victorious
         if battle_result['result'] == 'victory':
-            print("[BATTLE] Victory path")
+            logger.info("[BATTLE] Victory path")
             new_exp = knight['exp'] + battle_result['xp_gained']
             new_level = (new_exp // 100) + 1  # Level up every 100 XP
-            print(f"[BATTLE] New exp: {new_exp}, new level: {new_level}")
+            logger.info(f"[BATTLE] New exp: {new_exp}, new level: {new_level}")
             
             # Generate loot
             loot = generate_loot(monster)
-            print(f"[BATTLE] Loot generated: gold={loot['gold']}, items={loot['items']}")
+            logger.info(f"[BATTLE] Loot generated: gold={loot['gold']}, items={loot['items']}")
             
             # Award gold
             cursor.execute(
@@ -527,7 +537,7 @@ def start_battle():
             
             # Award items
             for item_id in loot['items']:
-                print(f"[BATTLE] Adding item {item_id} to inventory")
+                logger.info(f"[BATTLE] Adding item {item_id} to inventory")
                 add_item_to_inventory(cursor, knight['user_id'], item_id, 1)
             
             # Update knight stats
@@ -542,21 +552,21 @@ def start_battle():
             # Build loot items list, skipping any invalid items
             loot_items = []
             for item_id in loot['items']:
-                print(f"[BATTLE] Looking up item {item_id}")
+                logger.info(f"[BATTLE] Looking up item {item_id}")
                 item_def = get_item(item_id)
                 if item_def:
                     loot_items.append({'id': item_id, 'name': item_def['name']})
-                    print(f"[BATTLE] Added item: {item_def['name']}")
+                    logger.info(f"[BATTLE] Added item: {item_def['name']}")
                 else:
-                    print(f"[BATTLE] WARNING: Item {item_id} not found!")
+                    logger.warning(f"[BATTLE] WARNING: Item {item_id} not found!")
             
             battle_result['loot'] = {
                 'gold': loot['gold'],
                 'items': loot_items
             }
-            print(f"[BATTLE] Final loot: {battle_result['loot']}")
+            logger.info(f"[BATTLE] Final loot: {battle_result['loot']}")
         else:
-            print("[BATTLE] Defeat path")
+            logger.info("[BATTLE] Defeat path")
             cursor.execute(
                 "UPDATE knights SET current_hp = %s, is_alive = %s WHERE id = %s",
                 (battle_result['knight_hp'], battle_result['knight_alive'], knight_id)
@@ -565,12 +575,12 @@ def start_battle():
             battle_result['exp'] = knight['exp']
             battle_result['level'] = knight['level']
         
-        print(f"[BATTLE] About to commit. new_exp={new_exp}, new_level={new_level}")
+        logger.info(f"[BATTLE] About to commit. new_exp={new_exp}, new_level={new_level}")
         conn.commit()
         cursor.close()
         conn.close()
         
-        print(f"[BATTLE] Returning response")
+        logger.info(f"[BATTLE] Returning response")
         return jsonify({
             'result': battle_result['result'],
             'knight_hp': battle_result['knight_hp'],
@@ -586,20 +596,20 @@ def start_battle():
     except TypeError as e:
         import traceback
         error_msg = f"TypeError in battle: {str(e)}"
-        print(error_msg)
-        print(traceback.format_exc())
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
         return jsonify({'error': error_msg}), 500
     except KeyError as e:
         import traceback
         error_msg = f"KeyError in battle: {str(e)}"
-        print(error_msg)
-        print(traceback.format_exc())
+        logger.error(error_msg)
+        logger.error(traceback.format_exc())
         return jsonify({'error': error_msg}), 500
     except Exception as e:
         import traceback
         error_msg = str(e) if str(e) else 'Unknown error occurred'
-        print(f"Battle error: {error_msg}")
-        print(traceback.format_exc())
+        logger.error(f"Battle error: {error_msg}")
+        logger.error(traceback.format_exc())
         return jsonify({'error': error_msg}), 500
 
 @app.route('/api/regen', methods=['POST'])
