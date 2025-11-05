@@ -305,15 +305,27 @@ def equip_item(knight_id):
         # Check if slot already has an item equipped
         slot = item_def.get('slot')
         if slot:
+            # Get all equipped items for this knight to check their slots
             cursor.execute("""
-                SELECT i.id FROM inventory i
-                JOIN items_definitions
-                WHERE i.equipped_to_knight_id = %s AND i.item_id = %s
-            """, (knight_id, inventory_item['item_id']))
-            # For now, we'll allow multiple items in same slot
-            # You can add logic here to unequip existing item in slot
+                SELECT i.id, i.item_id
+                FROM inventory i
+                WHERE i.equipped_to_knight_id = %s
+            """, (knight_id,))
+            
+            equipped_items = cursor.fetchall()
+            
+            # Check if any equipped item uses the same slot
+            for equipped in equipped_items:
+                equipped_def = get_item(equipped['item_id'])
+                if equipped_def and equipped_def.get('slot') == slot:
+                    # Unequip the existing item in this slot
+                    cursor.execute("""
+                        UPDATE inventory
+                        SET equipped_to_knight_id = NULL
+                        WHERE id = %s
+                    """, (equipped['id'],))
         
-        # Equip the item
+        # Equip the new item
         cursor.execute("""
             UPDATE inventory
             SET equipped_to_knight_id = %s
