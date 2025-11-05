@@ -205,7 +205,10 @@
           <p><strong>Age:</strong> <span id="knightAge"></span></p>
         </div>
       </div>
-      <button class="battle-btn" onclick="startBattle()">⚔️ BATTLE</button>
+      <div style="display: flex; gap: 10px;">
+        <button class="battle-btn" onclick="startBattle()">⚔️ BATTLE</button>
+        <button class="battle-btn" style="background: #667eea;" onclick="openInventory()">🎒 INVENTORY</button>
+      </div>
     </div>
 
     <div class="main-grid">
@@ -237,6 +240,21 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- Inventory Modal -->
+  <div id="inventoryModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="max-width: 800px; margin: 40px auto; background: white; border-radius: 10px; padding: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">🎒 Inventory</h2>
+        <button onclick="closeInventory()" style="padding: 8px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+      </div>
+      <div style="margin-bottom: 20px; padding: 15px; background: #f5f7fa; border-radius: 5px;">
+        <h3 style="margin: 0;">💰 Gold: <span id="inventoryGold">0</span></h3>
+      </div>
+      <h3>Items</h3>
+      <div id="inventoryItems"></div>
     </div>
   </div>
 
@@ -330,15 +348,40 @@
 
     function displayEquipment() {
       const container = document.getElementById('equipmentGrid');
+      const equipment = knightData.equipment || [];
+      
+      // Create a map of equipped items by slot
+      const equippedBySlot = {};
+      equipment.forEach(item => {
+        if (item.slot) {
+          equippedBySlot[item.slot] = item;
+        }
+      });
       
       container.innerHTML = equipmentSlots.map((slot, index) => {
         const slotName = slot === 'ring' ? `Ring ${index === 7 ? '1' : '2'}` : slot;
-        return `
-          <div class="equipment-slot empty">
-            <div class="slot-name">${slotName}</div>
-            <div class="slot-item">Empty</div>
-          </div>
-        `;
+        const equippedItem = equippedBySlot[slot];
+        
+        if (equippedItem) {
+          const statsText = Object.entries(equippedItem.stats || {})
+            .map(([key, val]) => `${key}: +${val}`)
+            .join(', ');
+          
+          return `
+            <div class="equipment-slot filled" onclick="unequipItem(${equippedItem.inventory_id})" style="cursor: pointer;">
+              <div class="slot-name">${slotName}</div>
+              <div class="slot-item" style="color: #667eea; font-weight: 600;">${equippedItem.name}</div>
+              ${statsText ? `<div style="font-size: 11px; color: #27ae60;">${statsText}</div>` : ''}
+            </div>
+          `;
+        } else {
+          return `
+            <div class="equipment-slot empty">
+              <div class="slot-name">${slotName}</div>
+              <div class="slot-item">Empty</div>
+            </div>
+          `;
+        }
       }).join('');
     }
 
@@ -411,7 +454,21 @@
         
         // Show battle log
         const logText = data.log.join('\n');
-        alert(`BATTLE RESULTS:\n\n${logText}`);
+        let resultMessage = `BATTLE RESULTS:\n\n${logText}`;
+        
+        // Add loot information if victory
+        if (data.result === 'victory' && data.loot) {
+          resultMessage += `\n\n💰 LOOT COLLECTED 💰`;
+          resultMessage += `\n Gold: ${data.loot.gold}`;
+          if (data.loot.items.length > 0) {
+            resultMessage += `\n Items:`;
+            data.loot.items.forEach(item => {
+              resultMessage += `\n  - ${item.name}`;
+            });
+          }
+        }
+        
+        alert(resultMessage);
         
         // Check for level up
         const oldLevel = knightData.level;
@@ -452,6 +509,100 @@
         battleBtn.textContent = '⚔️ BATTLE';
         alert('Connection error: ' + error);
       });
+    }
+
+    async function unequipItem(inventoryId) {
+      if (!confirm('Unequip this item?')) return;
+      
+      try {
+        const response = await fetch(`/api/knights/${knightId}/unequip`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ inventory_id: inventoryId })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('Item unequipped!');
+          loadKnight(); // Reload to show updated equipment
+        } else {
+          alert('Error: ' + (data.error || 'Failed to unequip item'));
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    async function openInventory() {
+      try {
+        const response = await fetch(`/api/inventory?user_id=${user.user_id}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          document.getElementById('inventoryGold').textContent = data.gold;
+          displayInventory(data.items);
+          document.getElementById('inventoryModal').style.display = 'block';
+        } else {
+          alert('Error loading inventory');
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    function closeInventory() {
+      document.getElementById('inventoryModal').style.display = 'none';
+    }
+
+    function displayInventory(items) {
+      const container = document.getElementById('inventoryItems');
+      
+      if (items.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999;">No items</p>';
+        return;
+      }
+      
+      // Group stackable items, separate non-stackable
+      container.innerHTML = items.map(item => {
+        const isEquipped = item.equipped_to_knight_id !== null;
+        const statsText = Object.entries(item.stats || {})
+          .map(([key, val]) => `${key}: +${val}`)
+          .join(', ');
+        
+        return `
+          <div style="padding: 15px; background: ${isEquipped ? '#e8f5e9' : '#f5f7fa'}; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <strong>${item.name}</strong> ${item.stackable ? `(x${item.quantity})` : ''}
+              <div style="font-size: 12px; color: #666;">${item.type} ${statsText ? `• ${statsText}` : ''}</div>
+              ${isEquipped ? '<div style="font-size: 11px; color: #27ae60;">✓ Equipped</div>' : ''}
+            </div>
+            ${!item.stackable && !isEquipped ? `<button onclick="equipItemFromInventory(${item.id})" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Equip</button>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function equipItemFromInventory(inventoryId) {
+      try {
+        const response = await fetch(`/api/knights/${knightId}/equip`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ inventory_id: inventoryId })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('Item equipped!');
+          closeInventory();
+          loadKnight(); // Reload to show updated equipment
+        } else {
+          alert('Error: ' + (data.error || 'Failed to equip item'));
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
     }
 
     // Load knight on page load

@@ -3,8 +3,10 @@ from flask_cors import CORS
 import mysql.connector
 import bcrypt
 import os
+import random
 from monsters import get_monster
 from battle import simulate_battle
+from items import get_item
 
 app = Flask(__name__)
 CORS(app)
@@ -17,6 +19,57 @@ def get_db_connection():
         user=os.getenv('DB_USER', 'app'),
         password=os.getenv('DB_PASSWORD', 'password')
     )
+
+def add_item_to_inventory(cursor, user_id, item_id, quantity=1):
+    """Add item to user's inventory. Stacks if stackable, creates new row if not."""
+    item_def = get_item(item_id)
+    if not item_def:
+        return False
+    
+    if item_def['stackable']:
+        # Try to add to existing stack (not equipped)
+        cursor.execute("""
+            SELECT id, quantity FROM inventory 
+            WHERE user_id = %s AND item_id = %s AND equipped_to_knight_id IS NULL
+            LIMIT 1
+        """, (user_id, item_id))
+        
+        existing = cursor.fetchone()
+        if existing:
+            # Update existing stack
+            cursor.execute("""
+                UPDATE inventory SET quantity = quantity + %s 
+                WHERE id = %s
+            """, (quantity, existing[0]))
+        else:
+            # Create new stack
+            cursor.execute("""
+                INSERT INTO inventory (user_id, item_id, quantity) 
+                VALUES (%s, %s, %s)
+            """, (user_id, item_id, quantity))
+    else:
+        # Non-stackable: create separate rows
+        for _ in range(quantity):
+            cursor.execute("""
+                INSERT INTO inventory (user_id, item_id, quantity) 
+                VALUES (%s, %s, 1)
+            """, (user_id, item_id))
+    
+    return True
+
+def generate_loot(monster):
+    """Generate loot drops from monster."""
+    loot = {
+        'gold': random.randint(monster.gold_drop[0], monster.gold_drop[1]),
+        'items': []
+    }
+    
+    # Roll for each item in loot table
+    for item_id, drop_chance in monster.loot_table:
+        if random.random() < drop_chance:
+            loot['items'].append(item_id)
+    
+    return loot
 
 @app.route('/healthz')
 def healthz():
@@ -112,11 +165,38 @@ def get_knight(knight_id):
             (knight_id,)
         )
         knight = cursor.fetchone()
+        
+        if not knight:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Knight not found'}), 404
+        
+        # Get equipped items
+        cursor.execute("""
+            SELECT i.id, i.item_id, i.quantity
+            FROM inventory i
+            WHERE i.equipped_to_knight_id = %s
+        """, (knight_id,))
+        
+        equipped_items = cursor.fetchall()
         cursor.close()
         conn.close()
         
-        if not knight:
-            return jsonify({'error': 'Knight not found'}), 404
+        # Enrich equipped items with definitions
+        equipment = []
+        for item in equipped_items:
+            item_def = get_item(item['item_id'])
+            if item_def:
+                equipment.append({
+                    'inventory_id': item['id'],
+                    'item_id': item['item_id'],
+                    'name': item_def['name'],
+                    'slot': item_def.get('slot'),
+                    'stats': item_def.get('stats', {}),
+                    'type': item_def['type']
+                })
+        
+        knight['equipment'] = equipment
         
         return jsonify({'knight': knight}), 200
     except Exception as e:
@@ -166,6 +246,182 @@ def create_knight():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/knights/<int:knight_id>/equip', methods=['POST'])
+def equip_item(knight_id):
+    """Equip an item to a knight."""
+    data = request.json
+    inventory_id = data.get('inventory_id')
+    
+    if not inventory_id:
+        return jsonify({'error': 'inventory_id required'}), 400
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get knight info
+        cursor.execute(
+            "SELECT id, user_id FROM knights WHERE id = %s",
+            (knight_id,)
+        )
+        knight = cursor.fetchone()
+        
+        if not knight:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Knight not found'}), 404
+        
+        # Get item from inventory
+        cursor.execute("""
+            SELECT i.id, i.item_id, i.user_id, i.equipped_to_knight_id
+            FROM inventory i
+            WHERE i.id = %s AND i.user_id = %s
+        """, (inventory_id, knight['user_id']))
+        
+        inventory_item = cursor.fetchone()
+        
+        if not inventory_item:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Item not found in inventory'}), 404
+        
+        if inventory_item['equipped_to_knight_id'] is not None:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Item is already equipped'}), 400
+        
+        # Get item definition
+        item_def = get_item(inventory_item['item_id'])
+        if not item_def:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Invalid item'}), 400
+        
+        if item_def['stackable']:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Cannot equip stackable items'}), 400
+        
+        # Check if slot already has an item equipped
+        slot = item_def.get('slot')
+        if slot:
+            cursor.execute("""
+                SELECT i.id FROM inventory i
+                JOIN items_definitions
+                WHERE i.equipped_to_knight_id = %s AND i.item_id = %s
+            """, (knight_id, inventory_item['item_id']))
+            # For now, we'll allow multiple items in same slot
+            # You can add logic here to unequip existing item in slot
+        
+        # Equip the item
+        cursor.execute("""
+            UPDATE inventory
+            SET equipped_to_knight_id = %s
+            WHERE id = %s
+        """, (knight_id, inventory_id))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': 'Item equipped successfully'}), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/knights/<int:knight_id>/unequip', methods=['POST'])
+def unequip_item(knight_id):
+    """Unequip an item from a knight."""
+    data = request.json
+    inventory_id = data.get('inventory_id')
+    
+    if not inventory_id:
+        return jsonify({'error': 'inventory_id required'}), 400
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Verify item is equipped to this knight
+        cursor.execute("""
+            SELECT id FROM inventory
+            WHERE id = %s AND equipped_to_knight_id = %s
+        """, (inventory_id, knight_id))
+        
+        item = cursor.fetchone()
+        
+        if not item:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Item not equipped to this knight'}), 404
+        
+        # Unequip the item
+        cursor.execute("""
+            UPDATE inventory
+            SET equipped_to_knight_id = NULL
+            WHERE id = %s
+        """, (inventory_id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({'message': 'Item unequipped successfully'}), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/inventory', methods=['GET'])
+def get_inventory():
+    """Get user's inventory."""
+    user_id = request.args.get('user_id')
+    
+    if not user_id:
+        return jsonify({'error': 'user_id required'}), 400
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get user's gold
+        cursor.execute("SELECT gold FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        
+        # Get inventory items
+        cursor.execute("""
+            SELECT id, item_id, quantity, equipped_to_knight_id, created_at
+            FROM inventory
+            WHERE user_id = %s
+            ORDER BY created_at DESC
+        """, (user_id,))
+        
+        items = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        # Enrich with item definitions
+        enriched_items = []
+        for item in items:
+            item_def = get_item(item['item_id'])
+            if item_def:
+                enriched_items.append({
+                    **item,
+                    'name': item_def['name'],
+                    'type': item_def['type'],
+                    'stackable': item_def['stackable'],
+                    'stats': item_def.get('stats', {}),
+                    'slot': item_def.get('slot'),
+                    'rarity': item_def.get('rarity', 'common')
+                })
+        
+        return jsonify({
+            'gold': user['gold'] if user else 0,
+            'items': enriched_items
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/battle', methods=['POST'])
 def start_battle():
     data = request.json
@@ -211,6 +467,20 @@ def start_battle():
             new_exp = knight['exp'] + battle_result['xp_gained']
             new_level = (new_exp // 100) + 1  # Level up every 100 XP
             
+            # Generate loot
+            loot = generate_loot(monster)
+            
+            # Award gold
+            cursor.execute(
+                "UPDATE users SET gold = gold + %s WHERE id = %s",
+                (loot['gold'], knight['user_id'])
+            )
+            
+            # Award items
+            for item_id in loot['items']:
+                add_item_to_inventory(cursor, knight['user_id'], item_id, 1)
+            
+            # Update knight stats
             cursor.execute(
                 "UPDATE knights SET current_hp = %s, is_alive = %s, exp = %s, level = %s WHERE id = %s",
                 (battle_result['knight_hp'], battle_result['knight_alive'], new_exp, new_level, knight_id)
@@ -218,6 +488,10 @@ def start_battle():
             
             battle_result['exp'] = new_exp
             battle_result['level'] = new_level
+            battle_result['loot'] = {
+                'gold': loot['gold'],
+                'items': [{'id': item_id, 'name': get_item(item_id)['name']} for item_id in loot['items']]
+            }
         else:
             cursor.execute(
                 "UPDATE knights SET current_hp = %s, is_alive = %s WHERE id = %s",
@@ -239,7 +513,8 @@ def start_battle():
             'log': battle_result['log'],
             'xp_gained': battle_result['xp_gained'],
             'exp': battle_result['exp'],
-            'level': battle_result['level']
+            'level': battle_result['level'],
+            'loot': battle_result.get('loot', {'gold': 0, 'items': []})
         }), 200
         
     except Exception as e:

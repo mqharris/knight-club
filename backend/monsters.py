@@ -1,7 +1,7 @@
 # Monster definitions for Knight Club
 
 class Monster:
-    def __init__(self, name, hp, attack, defense, agility, xp_reward):
+    def __init__(self, name, hp, attack, defense, agility, xp_reward, gold_drop, loot_table):
         self.name = name
         self.hp = hp
         self.max_hp = hp
@@ -9,6 +9,8 @@ class Monster:
         self.defense = defense
         self.agility = agility
         self.xp_reward = xp_reward
+        self.gold_drop = gold_drop  # (min, max) tuple
+        self.loot_table = loot_table  # List of (item_id, drop_chance) tuples
     
     def to_dict(self):
         return {
@@ -29,7 +31,15 @@ MONSTERS = {
             attack=8,
             defense=2,
             agility=5,
-            xp_reward=10
+            xp_reward=10,
+            gold_drop=(5, 20),  # Drops 5-20 gold
+            loot_table=[
+                (101, 0.70),  # 70% Slime Residue
+                (201, 0.10),  # 10% Wooden Sword
+                (202, 0.10),  # 10% Wooden Shield
+                (203, 0.05),  # 5% Wooden Helmet
+                (204, 0.05),  # 5% Wooden Chest Armor
+            ]
         )
     ],
     'medium': [
