@@ -214,11 +214,15 @@ def start_battle():
                 "UPDATE knights SET current_hp = %s, is_alive = %s, exp = %s WHERE id = %s",
                 (battle_result['knight_hp'], battle_result['knight_alive'], new_exp, knight_id)
             )
+            
+            battle_result['exp'] = new_exp
         else:
             cursor.execute(
                 "UPDATE knights SET current_hp = %s, is_alive = %s WHERE id = %s",
                 (battle_result['knight_hp'], battle_result['knight_alive'], knight_id)
             )
+            
+            battle_result['exp'] = knight['exp']
         
         conn.commit()
         cursor.close()
@@ -230,7 +234,8 @@ def start_battle():
             'knight_max_hp': knight['max_hp'],
             'knight_alive': battle_result['knight_alive'],
             'log': battle_result['log'],
-            'xp_gained': battle_result['xp_gained']
+            'xp_gained': battle_result['xp_gained'],
+            'exp': battle_result['exp']
         }), 200
         
     except Exception as e:
@@ -246,11 +251,11 @@ def regen_hp():
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        # Heal all knights by 1 HP, up to their max_hp
+        # Heal all LIVING knights by 1 HP, up to their max_hp
         cursor.execute("""
             UPDATE knights 
             SET current_hp = LEAST(current_hp + 1, max_hp)
-            WHERE current_hp < max_hp
+            WHERE current_hp < max_hp AND is_alive = TRUE
         """)
         
         healed_count = cursor.rowcount

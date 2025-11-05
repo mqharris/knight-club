@@ -100,15 +100,17 @@ def simulate_battle(knight_data, monster):
     elif monster_combatant.is_alive:
         battle_log.append(f"💀 Defeat! {knight.name} was slain by the {monster_combatant.name}!")
         battle_log.append(f"⚰️  {knight.name} has died permanently...")
-        knight.hp = 0
         result = 'defeat'
         knight_alive = False
     else:
         battle_log.append("🤝 Draw! Both combatants fell!")
         battle_log.append(f"⚰️  {knight.name} has died permanently...")
-        knight.hp = 0
         result = 'draw'
         knight_alive = False
+    
+    # Ensure HP is 0 if knight died
+    if not knight_alive:
+        knight.hp = 0
     
     return {
         'result': result,
