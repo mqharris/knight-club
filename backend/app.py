@@ -526,9 +526,17 @@ def start_battle():
             
             battle_result['exp'] = new_exp
             battle_result['level'] = new_level
+            
+            # Build loot items list, skipping any invalid items
+            loot_items = []
+            for item_id in loot['items']:
+                item_def = get_item(item_id)
+                if item_def:
+                    loot_items.append({'id': item_id, 'name': item_def['name']})
+            
             battle_result['loot'] = {
                 'gold': loot['gold'],
-                'items': [{'id': item_id, 'name': get_item(item_id)['name']} for item_id in loot['items']]
+                'items': loot_items
             }
         else:
             cursor.execute(
@@ -555,11 +563,24 @@ def start_battle():
             'loot': battle_result.get('loot', {'gold': 0, 'items': []})
         }), 200
         
+    except TypeError as e:
+        import traceback
+        error_msg = f"TypeError in battle: {str(e)}"
+        print(error_msg)
+        print(traceback.format_exc())
+        return jsonify({'error': error_msg}), 500
+    except KeyError as e:
+        import traceback
+        error_msg = f"KeyError in battle: {str(e)}"
+        print(error_msg)
+        print(traceback.format_exc())
+        return jsonify({'error': error_msg}), 500
     except Exception as e:
         import traceback
-        print(f"Battle error: {e}")
+        error_msg = str(e) if str(e) else 'Unknown error occurred'
+        print(f"Battle error: {error_msg}")
         print(traceback.format_exc())
-        return jsonify({'error': str(e) if str(e) else 'Unknown error occurred'}), 500
+        return jsonify({'error': error_msg}), 500
 
 @app.route('/api/regen', methods=['POST'])
 def regen_hp():
