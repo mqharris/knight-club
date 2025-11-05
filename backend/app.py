@@ -446,15 +446,25 @@ def get_inventory():
 
 @app.route('/api/battle', methods=['POST'])
 def start_battle():
+    logger.error("=" * 80)
+    logger.error("[BATTLE] BATTLE ENDPOINT CALLED - START")
+    sys.stderr.flush()
+    
     data = request.json
     knight_id = data.get('knight_id')
     difficulty = data.get('difficulty', 'easy')
+    
+    logger.error(f"[BATTLE] Received: knight_id={knight_id}, difficulty={difficulty}")
+    sys.stderr.flush()
     
     if not knight_id:
         return jsonify({'error': 'knight_id required'}), 400
     
     if difficulty not in ['easy', 'medium', 'hard']:
         return jsonify({'error': 'Invalid difficulty'}), 400
+    
+    logger.error("[BATTLE] Validation passed, entering try block")
+    sys.stderr.flush()
     
     try:
         conn = get_db_connection()
@@ -596,20 +606,30 @@ def start_battle():
     except TypeError as e:
         import traceback
         error_msg = f"TypeError in battle: {str(e)}"
+        logger.error("!" * 80)
         logger.error(error_msg)
         logger.error(traceback.format_exc())
+        logger.error("!" * 80)
+        sys.stderr.flush()
         return jsonify({'error': error_msg}), 500
     except KeyError as e:
         import traceback
         error_msg = f"KeyError in battle: {str(e)}"
+        logger.error("!" * 80)
         logger.error(error_msg)
         logger.error(traceback.format_exc())
+        logger.error("!" * 80)
+        sys.stderr.flush()
         return jsonify({'error': error_msg}), 500
     except Exception as e:
         import traceback
         error_msg = str(e) if str(e) else 'Unknown error occurred'
+        logger.error("!" * 80)
         logger.error(f"Battle error: {error_msg}")
+        logger.error(f"Error type: {type(e)}")
         logger.error(traceback.format_exc())
+        logger.error("!" * 80)
+        sys.stderr.flush()
         return jsonify({'error': error_msg}), 500
 
 @app.route('/api/regen', methods=['POST'])
