@@ -18,7 +18,7 @@ git commit -m "$COMMIT_MSG" || echo "No changes to commit"
 echo ""
 
 echo "⬆️  Pushing to git..."
-git push
+git push || echo "Nothing to push or push failed"
 echo "✅ Git push complete"
 echo ""
 
