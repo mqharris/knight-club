@@ -32,7 +32,7 @@ def simulate_battle(knight_data, monster):
         name=knight_data['name'],
         hp=knight_data['current_hp'],
         max_hp=knight_data['max_hp'],
-        attack=10 + knight_data.get('strength_bonus', 0),  # Base 10 + equipment
+        attack=10 + knight_data.get('attack_bonus', 0),  # Base 10 + equipment
         defense=10 + knight_data.get('defense_bonus', 0),   # Base 10 + equipment
         agility=10 + knight_data.get('agility_bonus', 0)    # Base 10 + equipment
     )

@@ -468,6 +468,32 @@ def start_battle():
             conn.close()
             return jsonify({'error': 'Knight has no HP remaining'}), 400
         
+        # Get equipped items and calculate stat bonuses
+        cursor.execute("""
+            SELECT i.item_id
+            FROM inventory i
+            WHERE i.equipped_to_knight_id = %s
+        """, (knight_id,))
+        
+        equipped_items = cursor.fetchall()
+        
+        # Calculate total stat bonuses from equipment
+        attack_bonus = 0
+        defense_bonus = 0
+        agility_bonus = 0
+        
+        for item in equipped_items:
+            item_def = get_item(item['item_id'])
+            if item_def and 'stats' in item_def:
+                attack_bonus += item_def['stats'].get('attack', 0)
+                defense_bonus += item_def['stats'].get('defense', 0)
+                agility_bonus += item_def['stats'].get('agility', 0)
+        
+        # Add bonuses to knight data
+        knight['attack_bonus'] = attack_bonus
+        knight['defense_bonus'] = defense_bonus
+        knight['agility_bonus'] = agility_bonus
+        
         # Get monster
         monster = get_monster(difficulty)
         
