@@ -597,7 +597,7 @@
 
     async function openInventory() {
       try {
-        const response = await fetch(`/api/inventory?user_id=${user.user_id}`);
+        const response = await fetch(`/api/inventory?knight_id=${knightId}`);
         const data = await response.json();
         
         if (response.ok) {
@@ -626,7 +626,7 @@
       
       // Group stackable items, separate non-stackable
       container.innerHTML = items.map(item => {
-        const isEquipped = item.equipped_to_knight_id !== null;
+        const isEquipped = item.is_equipped === true;
         const statsText = Object.entries(item.stats || {})
           .map(([key, val]) => `${key}: +${val}`)
           .join(', ');

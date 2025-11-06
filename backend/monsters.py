@@ -86,9 +86,9 @@ MONSTERS = {
             gold_drop=(25, 60),
             loot_table=[
                 (103, 0.75),  # 75% Wolf Fang
-                (301, 0.020),  # 20% Stone Sword
-                (302, 0.015),  # 15% Stone Axe
-                (303, 0.010),  # 10% Stone Shield
+                (301, 0.08),  # 8% Stone Sword (was 2%)
+                (302, 0.06),  # 6% Stone Axe (was 1.5%)
+                (303, 0.04),  # 4% Stone Shield (was 1%)
             ]
         ),
         Monster(
@@ -100,11 +100,11 @@ MONSTERS = {
             xp_reward=50,
             gold_drop=(30, 70),
             loot_table=[
-                (102, 0.090),  # 90% Goblin Ear
-                (301, 0.025),  # 25% Stone Sword
-                (303, 0.020),  # 20% Stone Shield
-                (304, 0.015),  # 15% Stone Helmet
-                (305, 0.010),  # 10% Stone Chest Armor
+                (102, 0.90),  # 90% Goblin Ear
+                (301, 0.10),  # 10% Stone Sword (was 2.5%)
+                (303, 0.08),  # 8% Stone Shield (was 2%)
+                (304, 0.06),  # 6% Stone Helmet (was 1.5%)
+                (305, 0.04),  # 4% Stone Chest Armor (was 1%)
             ]
         ),
         Monster(
@@ -116,10 +116,10 @@ MONSTERS = {
             xp_reward=60,
             gold_drop=(40, 80),
             loot_table=[
-                (302, 0.030),  # 30% Stone Axe
-                (301, 0.025),  # 25% Stone Sword
-                (305, 0.020),  # 20% Stone Chest Armor
-                (303, 0.015),  # 15% Stone Shield
+                (302, 0.12),  # 12% Stone Axe (was 3%)
+                (301, 0.10),  # 10% Stone Sword (was 2.5%)
+                (305, 0.08),  # 8% Stone Chest Armor (was 2%)
+                (303, 0.06),  # 6% Stone Shield (was 1.5%)
             ]
         ),
     ],
@@ -134,18 +134,18 @@ MONSTERS = {
             gold_drop=(60, 120),
             loot_table=[
                 (104, 0.80),  # 80% Orc Tusk
-                (401, 0.40),  # 40% Iron Sword
-                (402, 0.35),  # 35% Iron Axe
-                (403, 0.30),  # 30% Iron Shield
-                (404, 0.25),  # 25% Iron Helmet
-                (405, 0.25),  # 25% Iron Chest Armor
-                (406, 0.20),  # 20% Iron Pants
+                (401, 0.16),  # 16% Iron Sword (was 4%)
+                (402, 0.14),  # 14% Iron Axe (was 3.5%)
+                (403, 0.12),  # 12% Iron Shield (was 3%)
+                (404, 0.10),  # 10% Iron Helmet (was 2.5%)
+                (405, 0.10),  # 10% Iron Chest Armor (was 2.5%)
+                (406, 0.08),  # 8% Iron Pants (was 2%)
             ]
         ),
     ]
 }
 
-def get_monster(difficulty='easy', index=0):
+def get_monster(difficulty='easy', index=None):
     """
     Get a random monster by difficulty.
     If index is provided and valid, returns that specific monster.
@@ -156,7 +156,7 @@ def get_monster(difficulty='easy', index=0):
         return MONSTERS['easy'][0]  # Fallback to easy slime
     
     # If index is specified and valid, use it
-    if 0 <= index < len(monsters):
+    if index is not None and 0 <= index < len(monsters):
         return monsters[index]
     
     # Otherwise, return a random monster from the tier

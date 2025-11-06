@@ -30,8 +30,8 @@ def get_db_connection():
         password=os.getenv('DB_PASSWORD', 'password')
     )
 
-def add_item_to_inventory(cursor, user_id, item_id, quantity=1):
-    """Add item to user's inventory. Stacks if stackable, creates new row if not."""
+def add_item_to_inventory(cursor, knight_id, item_id, quantity=1):
+    """Add item to knight's inventory. Stacks if stackable, creates new row if not."""
     item_def = get_item(item_id)
     if not item_def:
         return False
@@ -40,9 +40,9 @@ def add_item_to_inventory(cursor, user_id, item_id, quantity=1):
         # Try to add to existing stack (not equipped)
         cursor.execute("""
             SELECT id, quantity FROM inventory 
-            WHERE user_id = %s AND item_id = %s AND equipped_to_knight_id IS NULL
+            WHERE knight_id = %s AND item_id = %s AND is_equipped = FALSE
             LIMIT 1
-        """, (user_id, item_id))
+        """, (knight_id, item_id))
         
         existing = cursor.fetchone()
         if existing:
@@ -54,16 +54,16 @@ def add_item_to_inventory(cursor, user_id, item_id, quantity=1):
         else:
             # Create new stack
             cursor.execute("""
-                INSERT INTO inventory (user_id, item_id, quantity) 
+                INSERT INTO inventory (knight_id, item_id, quantity) 
                 VALUES (%s, %s, %s)
-            """, (user_id, item_id, quantity))
+            """, (knight_id, item_id, quantity))
     else:
         # Non-stackable: create separate rows
         for _ in range(quantity):
             cursor.execute("""
-                INSERT INTO inventory (user_id, item_id, quantity) 
+                INSERT INTO inventory (knight_id, item_id, quantity) 
                 VALUES (%s, %s, 1)
-            """, (user_id, item_id))
+            """, (knight_id, item_id))
     
     return True
 
@@ -209,7 +209,7 @@ def get_knight(knight_id):
         cursor.execute("""
             SELECT i.id, i.item_id, i.quantity
             FROM inventory i
-            WHERE i.equipped_to_knight_id = %s
+            WHERE i.knight_id = %s AND i.is_equipped = TRUE
         """, (knight_id,))
         
         equipped_items = cursor.fetchall()
@@ -293,33 +293,21 @@ def equip_item(knight_id):
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
-        # Get knight info
-        cursor.execute(
-            "SELECT id, user_id FROM knights WHERE id = %s",
-            (knight_id,)
-        )
-        knight = cursor.fetchone()
-        
-        if not knight:
-            cursor.close()
-            conn.close()
-            return jsonify({'error': 'Knight not found'}), 404
-        
-        # Get item from inventory
+        # Get item from knight's inventory
         cursor.execute("""
-            SELECT i.id, i.item_id, i.user_id, i.equipped_to_knight_id
+            SELECT i.id, i.item_id, i.is_equipped
             FROM inventory i
-            WHERE i.id = %s AND i.user_id = %s
-        """, (inventory_id, knight['user_id']))
+            WHERE i.id = %s AND i.knight_id = %s
+        """, (inventory_id, knight_id))
         
         inventory_item = cursor.fetchone()
         
         if not inventory_item:
             cursor.close()
             conn.close()
-            return jsonify({'error': 'Item not found in inventory'}), 404
+            return jsonify({'error': 'Item not found in this knight\'s inventory'}), 404
         
-        if inventory_item['equipped_to_knight_id'] is not None:
+        if inventory_item['is_equipped']:
             cursor.close()
             conn.close()
             return jsonify({'error': 'Item is already equipped'}), 400
@@ -343,7 +331,7 @@ def equip_item(knight_id):
             cursor.execute("""
                 SELECT i.id, i.item_id
                 FROM inventory i
-                WHERE i.equipped_to_knight_id = %s
+                WHERE i.knight_id = %s AND i.is_equipped = TRUE
             """, (knight_id,))
             
             equipped_items = cursor.fetchall()
@@ -355,16 +343,16 @@ def equip_item(knight_id):
                     # Unequip the existing item in this slot
                     cursor.execute("""
                         UPDATE inventory
-                        SET equipped_to_knight_id = NULL
+                        SET is_equipped = FALSE
                         WHERE id = %s
                     """, (equipped['id'],))
         
         # Equip the new item
         cursor.execute("""
             UPDATE inventory
-            SET equipped_to_knight_id = %s
+            SET is_equipped = TRUE
             WHERE id = %s
-        """, (knight_id, inventory_id))
+        """, (inventory_id,))
         
         conn.commit()
         cursor.close()
@@ -391,7 +379,7 @@ def unequip_item(knight_id):
         # Verify item is equipped to this knight
         cursor.execute("""
             SELECT id FROM inventory
-            WHERE id = %s AND equipped_to_knight_id = %s
+            WHERE id = %s AND knight_id = %s AND is_equipped = TRUE
         """, (inventory_id, knight_id))
         
         item = cursor.fetchone()
@@ -399,12 +387,12 @@ def unequip_item(knight_id):
         if not item:
             cursor.close()
             conn.close()
-            return jsonify({'error': 'Item not equipped to this knight'}), 404
+            return jsonify({'error': 'Item not found or not equipped to this knight'}), 404
         
         # Unequip the item
         cursor.execute("""
             UPDATE inventory
-            SET equipped_to_knight_id = NULL
+            SET is_equipped = FALSE
             WHERE id = %s
         """, (inventory_id,))
         
@@ -419,27 +407,33 @@ def unequip_item(knight_id):
 
 @app.route('/api/inventory', methods=['GET'])
 def get_inventory():
-    """Get user's inventory."""
-    user_id = request.args.get('user_id')
+    """Get knight's inventory."""
+    knight_id = request.args.get('knight_id')
     
-    if not user_id:
-        return jsonify({'error': 'user_id required'}), 400
+    if not knight_id:
+        return jsonify({'error': 'knight_id required'}), 400
     
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         
+        # Get knight's user_id for gold
+        cursor.execute("SELECT user_id FROM knights WHERE id = %s", (knight_id,))
+        knight = cursor.fetchone()
+        if not knight:
+            return jsonify({'error': 'Knight not found'}), 404
+        
         # Get user's gold
-        cursor.execute("SELECT gold FROM users WHERE id = %s", (user_id,))
+        cursor.execute("SELECT gold FROM users WHERE id = %s", (knight['user_id'],))
         user = cursor.fetchone()
         
-        # Get inventory items
+        # Get inventory items for this knight
         cursor.execute("""
-            SELECT id, item_id, quantity, equipped_to_knight_id, created_at
+            SELECT id, item_id, quantity, is_equipped, created_at
             FROM inventory
-            WHERE user_id = %s
+            WHERE knight_id = %s
             ORDER BY created_at DESC
-        """, (user_id,))
+        """, (knight_id,))
         
         items = cursor.fetchall()
         cursor.close()
@@ -517,7 +511,7 @@ def start_battle():
         cursor.execute("""
             SELECT i.item_id
             FROM inventory i
-            WHERE i.equipped_to_knight_id = %s
+            WHERE i.knight_id = %s AND i.is_equipped = TRUE
         """, (knight_id,))
         
         equipped_items = cursor.fetchall()
@@ -570,10 +564,10 @@ def start_battle():
                 (loot['gold'], knight['user_id'])
             )
             
-            # Award items
+            # Award items to this knight's inventory
             for item_id in loot['items']:
                 logger.info(f"[BATTLE] Adding item {item_id} to inventory")
-                add_item_to_inventory(cursor, knight['user_id'], item_id, 1)
+                add_item_to_inventory(cursor, knight_id, item_id, 1)
             
             # Update knight stats
             cursor.execute(

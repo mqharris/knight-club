@@ -155,7 +155,7 @@ ITEMS = {
         "type": "armor",
         "stackable": False,
         "slot": "shield",
-        "stats": {"defense": 12},
+        "stats": {"defense": 12, "agility": -2},
         "description": "A sturdy iron shield (built to last (thats what she said))",
         "rarity": "epic"
     },
@@ -173,7 +173,7 @@ ITEMS = {
         "type": "armor",
         "stackable": False,
         "slot": "chest",
-        "stats": {"defense": 14},
+        "stats": {"defense": 14, "agility": -2},
         "description": "Iron plates forged into proper armor (you've played rpgs before)",
         "rarity": "epic"
     },
@@ -182,7 +182,7 @@ ITEMS = {
         "type": "armor",
         "stackable": False,
         "slot": "pants",
-        "stats": {"defense": 10},
+        "stats": {"defense": 10, "agility": -2},
         "description": "Iron leg armor (left clank right clank left clank...)",
         "rarity": "epic"
     },
