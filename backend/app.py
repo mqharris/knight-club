@@ -512,6 +512,105 @@ def sell_duplicate_equipment(knight_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/knights/<int:knight_id>/use-potion', methods=['POST'])
+def use_potion(knight_id):
+    """Use an HP potion on a knight."""
+    data = request.json
+    user_id = data.get('user_id')
+    inventory_id = data.get('inventory_id')
+    
+    if not user_id or not inventory_id:
+        return jsonify({'error': 'user_id and inventory_id required'}), 400
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Verify knight ownership
+        if not verify_knight_ownership(cursor, knight_id, user_id):
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Unauthorized: Knight does not belong to this user'}), 403
+        
+        # Get the item from inventory
+        cursor.execute("""
+            SELECT id, item_id, quantity
+            FROM inventory
+            WHERE id = %s AND knight_id = %s
+        """, (inventory_id, knight_id))
+        
+        inventory_item = cursor.fetchone()
+        
+        if not inventory_item:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Item not found in inventory'}), 404
+        
+        # Check if it's a potion
+        item_def = get_item(inventory_item['item_id'])
+        if not item_def or item_def['type'] != 'consumable':
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Item is not a consumable'}), 400
+        
+        # Get knight data
+        cursor.execute("""
+            SELECT current_hp, max_hp, is_alive
+            FROM knights
+            WHERE id = %s
+        """, (knight_id,))
+        
+        knight = cursor.fetchone()
+        
+        if not knight:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Knight not found'}), 404
+        
+        if not knight['is_alive']:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Cannot use potions on dead knights'}), 400
+        
+        if knight['current_hp'] >= knight['max_hp']:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Knight already at full HP'}), 400
+        
+        # Apply healing
+        heal_amount = item_def['effect']['amount']
+        new_hp = min(knight['current_hp'] + heal_amount, knight['max_hp'])
+        actual_healing = new_hp - knight['current_hp']
+        
+        cursor.execute("""
+            UPDATE knights
+            SET current_hp = %s
+            WHERE id = %s
+        """, (new_hp, knight_id))
+        
+        # Remove one potion from inventory
+        if inventory_item['quantity'] > 1:
+            cursor.execute("""
+                UPDATE inventory
+                SET quantity = quantity - 1
+                WHERE id = %s
+            """, (inventory_id,))
+        else:
+            cursor.execute("DELETE FROM inventory WHERE id = %s", (inventory_id,))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'message': f'Used {item_def["name"]}! Healed {actual_healing} HP',
+            'new_hp': new_hp,
+            'max_hp': knight['max_hp']
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/inventory', methods=['GET'])
 def get_inventory():
     """Get knight's inventory."""
@@ -565,6 +664,101 @@ def get_inventory():
         return jsonify({
             'gold': user['gold'] if user else 0,
             'items': enriched_items
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/shop/items', methods=['GET'])
+def get_shop_items():
+    """Get all items available in the shop."""
+    shop_items = [
+        {
+            'id': 501,
+            'name': 'HP Potion',
+            'description': 'Restores 25 HP when consumed',
+            'price': 100,
+            'type': 'consumable'
+        }
+    ]
+    return jsonify(shop_items), 200
+
+@app.route('/api/shop/buy', methods=['POST'])
+def buy_shop_item():
+    """Buy an item from the shop."""
+    data = request.json
+    user_id = data.get('user_id')
+    knight_id = data.get('knight_id')
+    item_id = data.get('item_id')
+    quantity = data.get('quantity', 1)
+    
+    if not user_id or not knight_id or not item_id:
+        return jsonify({'error': 'user_id, knight_id, and item_id required'}), 400
+    
+    if quantity < 1:
+        return jsonify({'error': 'Quantity must be at least 1'}), 400
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Verify knight ownership
+        if not verify_knight_ownership(cursor, knight_id, user_id):
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Unauthorized: Knight does not belong to this user'}), 403
+        
+        # Get item details
+        item_def = get_item(item_id)
+        if not item_def:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Item not found'}), 404
+        
+        # Check if item is available in shop (hardcoded for now)
+        shop_prices = {
+            501: 100  # HP Potion
+        }
+        
+        if item_id not in shop_prices:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Item not available in shop'}), 400
+        
+        price = shop_prices[item_id]
+        total_cost = price * quantity
+        
+        # Get user's gold
+        cursor.execute("SELECT gold FROM users WHERE id = %s", (user_id,))
+        user = cursor.fetchone()
+        
+        if not user:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'User not found'}), 404
+        
+        if user['gold'] < total_cost:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': f'Not enough gold. Need {total_cost}, have {user["gold"]}'}), 400
+        
+        # Deduct gold
+        cursor.execute("""
+            UPDATE users
+            SET gold = gold - %s
+            WHERE id = %s
+        """, (total_cost, user_id))
+        
+        # Add item to knight's inventory
+        add_item_to_inventory(cursor, knight_id, item_id, quantity)
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'message': f'Purchased {quantity}x {item_def["name"]} for {total_cost} gold',
+            'gold_spent': total_cost
         }), 200
         
     except Exception as e:

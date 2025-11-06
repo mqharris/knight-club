@@ -209,6 +209,16 @@ ITEMS = {
         "description": "A massive orc tusk (worth a fortune)",
         "rarity": "rare"
     },
+    
+    # Consumables
+    501: {
+        "name": "HP Potion",
+        "type": "consumable",
+        "stackable": True,
+        "description": "Restores 25 HP when consumed",
+        "rarity": "common",
+        "effect": {"type": "heal", "amount": 25}
+    },
 }
 
 def get_item(item_id):

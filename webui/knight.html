@@ -210,6 +210,7 @@
         <button class="battle-btn" onclick="startBattle('medium')" style="flex: 1; min-width: 150px; background: #f39c12;">⚔️ MEDIUM</button>
         <button class="battle-btn" onclick="startBattle('hard')" style="flex: 1; min-width: 150px; background: #e74c3c;">⚔️ HARD</button>
         <button class="battle-btn" style="background: #667eea; flex: 1; min-width: 150px;" onclick="openInventory()">🎒 INVENTORY</button>
+        <button class="battle-btn" style="background: #27ae60; flex: 1; min-width: 150px;" onclick="openShop()">🏪 SHOP</button>
       </div>
     </div>
 
@@ -261,6 +262,21 @@
       </div>
       <h3>Items</h3>
       <div id="inventoryItems"></div>
+    </div>
+  </div>
+
+  <!-- Shop Modal -->
+  <div id="shopModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="max-width: 800px; margin: 40px auto; background: white; border-radius: 10px; padding: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">🏪 Shop</h2>
+        <button onclick="closeShop()" style="padding: 8px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+      </div>
+      <div style="margin-bottom: 20px; padding: 15px; background: #f5f7fa; border-radius: 5px;">
+        <h3 style="margin: 0;">💰 Gold: <span id="shopGold">0</span></h3>
+      </div>
+      <h3>Items for Sale</h3>
+      <div id="shopItems"></div>
     </div>
   </div>
 
@@ -636,6 +652,14 @@
           .map(([key, val]) => `${key}: +${val}`)
           .join(', ');
         
+        // Determine action button
+        let actionButton = '';
+        if (item.type === 'consumable') {
+          actionButton = `<button onclick="usePotion(${item.id})" style="padding: 8px 16px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Use</button>`;
+        } else if (!item.stackable && !isEquipped) {
+          actionButton = `<button onclick="equipItemFromInventory(${item.id})" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Equip</button>`;
+        }
+        
         return `
           <div style="padding: 15px; background: ${isEquipped ? '#d4edda' : '#f5f7fa'}; border: ${isEquipped ? '2px solid #28a745' : '1px solid #e0e0e0'}; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; ${isEquipped ? 'box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);' : ''}">
             <div style="flex: 1;">
@@ -644,7 +668,7 @@
               ${item.description ? `<div style="font-size: 11px; color: #888; font-style: italic; margin-top: 4px;">${item.description}</div>` : ''}
               ${isEquipped ? '<div style="font-size: 11px; color: #28a745; font-weight: bold; margin-top: 4px;">⚔️ EQUIPPED</div>' : ''}
             </div>
-            ${!item.stackable && !isEquipped ? `<button onclick="equipItemFromInventory(${item.id})" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Equip</button>` : ''}
+            ${actionButton}
           </div>
         `;
       }).join('');
@@ -695,6 +719,109 @@
           loadKnight(); // Reload knight stats
         } else {
           alert('Error: ' + (data.error || 'Failed to sell items'));
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    async function openShop() {
+      try {
+        const response = await fetch('/api/shop/items');
+        const items = await response.json();
+        
+        document.getElementById('shopGold').textContent = knightData.gold || 0;
+        displayShopItems(items);
+        document.getElementById('shopModal').style.display = 'block';
+      } catch (error) {
+        alert('Error loading shop');
+      }
+    }
+
+    function closeShop() {
+      document.getElementById('shopModal').style.display = 'none';
+    }
+
+    function displayShopItems(items) {
+      const container = document.getElementById('shopItems');
+      
+      container.innerHTML = items.map(item => {
+        return `
+          <div style="padding: 15px; background: #f5f7fa; border: 1px solid #e0e0e0; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+              <strong>${item.name}</strong>
+              <div style="font-size: 12px; color: #666;">${item.type}</div>
+              <div style="font-size: 11px; color: #888; font-style: italic; margin-top: 4px;">${item.description}</div>
+              <div style="font-size: 14px; color: #27ae60; font-weight: bold; margin-top: 4px;">💰 ${item.price} gold</div>
+            </div>
+            <div style="display: flex; gap: 5px; align-items: center;">
+              <input type="number" id="qty-${item.id}" value="1" min="1" max="99" style="width: 50px; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+              <button onclick="buyItem(${item.id}, ${item.price})" style="padding: 8px 16px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap;">Buy</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function buyItem(itemId, price) {
+      const qtyInput = document.getElementById(`qty-${itemId}`);
+      const quantity = parseInt(qtyInput.value) || 1;
+      
+      if (quantity < 1) {
+        alert('Quantity must be at least 1');
+        return;
+      }
+      
+      const totalCost = price * quantity;
+      if (!confirm(`Buy ${quantity}x for ${totalCost} gold?`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/shop/buy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: user.id,
+            knight_id: knightId,
+            item_id: itemId,
+            quantity: quantity
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert(`✅ ${data.message}`);
+          closeShop();
+          loadKnight(); // Reload to update gold
+        } else {
+          alert('Error: ' + (data.error || 'Failed to purchase item'));
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    async function usePotion(inventoryId) {
+      try {
+        const response = await fetch(`/api/knights/${knightId}/use-potion`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: user.id,
+            inventory_id: inventoryId
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert(`✅ ${data.message}`);
+          closeInventory();
+          loadKnight(); // Reload to show updated HP
+        } else {
+          alert('Error: ' + (data.error || 'Failed to use potion'));
         }
       } catch (error) {
         alert('Connection error');
