@@ -109,12 +109,12 @@ MONSTERS = {
         ),
         Monster(
             name='Troglodite',
-            hp=90,
-            attack=22,
-            defense=12,
-            agility=5,
-            xp_reward=60,
-            gold_drop=(40, 80),
+            hp=75,
+            attack=20,
+            defense=10,
+            agility=6,
+            xp_reward=55,
+            gold_drop=(35, 75),
             loot_table=[
                 (302, 0.12),  # 12% Stone Axe (was 3%)
                 (301, 0.10),  # 10% Stone Sword (was 2.5%)
