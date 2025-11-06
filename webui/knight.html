@@ -627,7 +627,7 @@
       
       // Group stackable items, separate non-stackable
       container.innerHTML = items.map(item => {
-        const isEquipped = item.is_equipped === true;
+        const isEquipped = item.is_equipped === true || item.is_equipped === 1;
         const statsText = Object.entries(item.stats || {})
           .map(([key, val]) => `${key}: +${val}`)
           .join(', ');
