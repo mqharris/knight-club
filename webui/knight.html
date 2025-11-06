@@ -734,10 +734,16 @@
 
     async function openShop() {
       try {
-        const response = await fetch('/api/shop/items');
-        const items = await response.json();
+        // Fetch shop items and user gold
+        const [shopResponse, inventoryResponse] = await Promise.all([
+          fetch('/api/shop/items'),
+          fetch(`/api/inventory?knight_id=${knightId}`)
+        ]);
         
-        document.getElementById('shopGold').textContent = knightData.gold || 0;
+        const items = await shopResponse.json();
+        const inventoryData = await inventoryResponse.json();
+        
+        document.getElementById('shopGold').textContent = inventoryData.gold || 0;
         displayShopItems(items);
         document.getElementById('shopModal').style.display = 'block';
       } catch (error) {
