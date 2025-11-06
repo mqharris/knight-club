@@ -134,48 +134,6 @@
       <div id="leaderboard"></div>
     </div>
 
-    <!-- Wanted Board Section -->
-    <div style="margin-top: 40px; padding: 20px; background: #ffe6e6; border-radius: 8px; border: 3px solid #c0392b;">
-      <h3 style="margin: 0 0 20px 0; color: #c0392b; display: flex; align-items: center; gap: 10px;">
-        ⚠️ WANTED BOARD - MOST DANGEROUS
-      </h3>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
-        <!-- Brent Card -->
-        <div onclick="showWantedReason('Brent', 'Wanted for the ruthless murder of countless knights across the realm. Known to show no mercy in battle. Extremely dangerous - has left a trail of fallen warriors in his wake. Approach with extreme caution.')" 
-             style="background: white; border: 3px solid #e74c3c; border-radius: 10px; padding: 20px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"
-             onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.2)';"
-             onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';">
-          <div style="text-align: center;">
-            <div style="font-size: 60px; margin-bottom: 10px;">🧔</div>
-            <h4 style="margin: 0; color: #c0392b; font-size: 24px;">BRENT</h4>
-            <div style="background: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; margin-top: 10px; font-weight: bold;">
-              REWARD: 50,000 GOLD
-            </div>
-            <div style="margin-top: 10px; color: #666; font-size: 14px;">
-              Charges: Mass Knight Murder
-            </div>
-          </div>
-        </div>
-
-        <!-- Craig Card -->
-        <div onclick="showWantedReason('Craig', 'Wanted for suspiciously rapid advancement through the ranks. Has been observed gaining levels at an impossible rate. Suspected of using forbidden dark magic or exploits. Investigation ongoing.')" 
-             style="background: white; border: 3px solid #e74c3c; border-radius: 10px; padding: 20px; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1);"
-             onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.2)';"
-             onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 4px 6px rgba(0,0,0,0.1)';">
-          <div style="text-align: center;">
-            <div style="font-size: 60px; margin-bottom: 10px;">🧑</div>
-            <h4 style="margin: 0; color: #c0392b; font-size: 24px;">CRAIG</h4>
-            <div style="background: #e74c3c; color: white; padding: 5px 10px; border-radius: 5px; margin-top: 10px; font-weight: bold;">
-              REWARD: 25,000 GOLD
-            </div>
-            <div style="margin-top: 10px; color: #666; font-size: 14px;">
-              Charges: Suspicious Leveling
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <div id="message" style="margin-top: 20px;"></div>
   </div>
 
@@ -366,10 +324,6 @@
           }).join('')}
         </div>
       `;
-    }
-
-    function showWantedReason(name, reason) {
-      alert(`🚨 WANTED: ${name.toUpperCase()} 🚨\n\n${reason}`);
     }
 
     // Load data on page load
