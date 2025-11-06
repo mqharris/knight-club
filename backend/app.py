@@ -405,6 +405,79 @@ def unequip_item(knight_id):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/knights/<int:knight_id>/sell-duplicates', methods=['POST'])
+def sell_duplicate_equipment(knight_id):
+    """Sell all unequipped equipment items for gold."""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        # Verify knight exists and get user_id
+        cursor.execute("SELECT user_id FROM knights WHERE id = %s", (knight_id,))
+        knight = cursor.fetchone()
+        
+        if not knight:
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Knight not found'}), 404
+        
+        user_id = knight['user_id']
+        
+        # Get all unequipped equipment items
+        cursor.execute("""
+            SELECT id, item_id, quantity
+            FROM inventory
+            WHERE knight_id = %s AND is_equipped = FALSE
+        """, (knight_id,))
+        
+        items = cursor.fetchall()
+        
+        total_gold = 0
+        items_sold = 0
+        
+        for item in items:
+            item_def = get_item(item['item_id'])
+            
+            # Only sell equipment (not materials)
+            if item_def and not item_def.get('stackable', False):
+                # Calculate sell price based on item tier
+                item_id = item['item_id']
+                if 200 <= item_id < 300:  # Wooden
+                    sell_price = 10
+                elif 300 <= item_id < 400:  # Stone
+                    sell_price = 40
+                elif 400 <= item_id < 500:  # Iron
+                    sell_price = 100
+                else:
+                    sell_price = 5  # Default
+                
+                total_gold += sell_price
+                items_sold += 1
+                
+                # Delete the item from inventory
+                cursor.execute("DELETE FROM inventory WHERE id = %s", (item['id'],))
+        
+        # Add gold to user
+        if total_gold > 0:
+            cursor.execute("""
+                UPDATE users
+                SET gold = gold + %s
+                WHERE id = %s
+            """, (total_gold, user_id))
+        
+        conn.commit()
+        cursor.close()
+        conn.close()
+        
+        return jsonify({
+            'message': f'Sold {items_sold} items for {total_gold} gold',
+            'items_sold': items_sold,
+            'gold_earned': total_gold
+        }), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/inventory', methods=['GET'])
 def get_inventory():
     """Get knight's inventory."""
