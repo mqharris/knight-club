@@ -632,12 +632,12 @@
           .join(', ');
         
         return `
-          <div style="padding: 15px; background: ${isEquipped ? '#e8f5e9' : '#f5f7fa'}; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="padding: 15px; background: ${isEquipped ? '#d4edda' : '#f5f7fa'}; border: ${isEquipped ? '2px solid #28a745' : '1px solid #e0e0e0'}; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; ${isEquipped ? 'box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);' : ''}">
             <div style="flex: 1;">
-              <strong>${item.name}</strong> ${item.stackable ? `(x${item.quantity})` : ''}
+              <strong style="${isEquipped ? 'color: #155724;' : ''}">${item.name}</strong> ${item.stackable ? `(x${item.quantity})` : ''}
               <div style="font-size: 12px; color: #666;">${item.type} ${statsText ? `• ${statsText}` : ''}</div>
               ${item.description ? `<div style="font-size: 11px; color: #888; font-style: italic; margin-top: 4px;">${item.description}</div>` : ''}
-              ${isEquipped ? '<div style="font-size: 11px; color: #27ae60; margin-top: 4px;">✓ Equipped</div>' : ''}
+              ${isEquipped ? '<div style="font-size: 11px; color: #28a745; font-weight: bold; margin-top: 4px;">⚔️ EQUIPPED</div>' : ''}
             </div>
             ${!item.stackable && !isEquipped ? `<button onclick="equipItemFromInventory(${item.id})" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Equip</button>` : ''}
           </div>
