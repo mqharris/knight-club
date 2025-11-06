@@ -27,14 +27,18 @@ def simulate_battle(knight_data, monster):
     Simulate a turn-based battle between knight and monster.
     Returns battle log and final knight HP.
     """
+    # Calculate level bonus (each level adds +1 to all stats)
+    level = knight_data.get('level', 1)
+    level_bonus = level - 1  # Level 1 = 0 bonus, Level 2 = 1 bonus, etc.
+    
     # Create combatants
     knight = Combatant(
         name=knight_data['name'],
         hp=knight_data['current_hp'],
         max_hp=knight_data['max_hp'],
-        attack=10 + knight_data.get('attack_bonus', 0),  # Base 10 + equipment
-        defense=10 + knight_data.get('defense_bonus', 0),   # Base 10 + equipment
-        agility=10 + knight_data.get('agility_bonus', 0)    # Base 10 + equipment
+        attack=10 + level_bonus + knight_data.get('attack_bonus', 0),   # Base 10 + level + equipment
+        defense=10 + level_bonus + knight_data.get('defense_bonus', 0),  # Base 10 + level + equipment
+        agility=10 + level_bonus + knight_data.get('agility_bonus', 0)   # Base 10 + level + equipment
     )
     
     monster_combatant = Combatant(

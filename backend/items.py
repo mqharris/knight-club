@@ -56,6 +56,96 @@ ITEMS = {
         "description": "Wooden leg armor (what? you want me to stand inside this wooden box?)",
         "rarity": "uncommon"
     },
+    206: {
+        "name": "Wooden Bow",
+        "type": "weapon",
+        "stackable": False,
+        "slot": "weapon",
+        "stats": {"attack": 4, "agility": 2},
+        "description": "A crude wooden bow (arrows sold separately)",
+        "rarity": "uncommon"
+    },
+    207: {
+        "name": "Wooden Staff",
+        "type": "weapon",
+        "stackable": False,
+        "slot": "weapon",
+        "stats": {"attack": 3, "defense": 2},
+        "description": "A sturdy walking staff (bonk)",
+        "rarity": "uncommon"
+    },
+    208: {
+        "name": "Wooden Dagger",
+        "type": "weapon",
+        "stackable": False,
+        "slot": "weapon",
+        "stats": {"attack": 3, "agility": 3},
+        "description": "A small wooden blade (one single big single sliver)",
+        "rarity": "uncommon"
+    },
+    
+    # Stone Equipment (level 10-20 drops)
+    301: {
+        "name": "Stone Sword",
+        "type": "weapon",
+        "stackable": False,
+        "slot": "weapon",
+        "stats": {"attack": 10},
+        "description": "A heavy stone blade (your enemies will feel the weight)",
+        "rarity": "rare"
+    },
+    302: {
+        "name": "Stone Axe",
+        "type": "weapon",
+        "stackable": False,
+        "slot": "weapon",
+        "stats": {"attack": 12, "defense": -2},
+        "description": "A brutal stone axe (its a rock)",
+        "rarity": "rare"
+    },
+    303: {
+        "name": "Stone Shield",
+        "type": "armor",
+        "stackable": False,
+        "slot": "shield",
+        "stats": {"defense": 7, "agility": -1},
+        "description": "A solid stone shield (heavy)",
+        "rarity": "rare"
+    },
+    304: {
+        "name": "Stone Helmet",
+        "type": "armor",
+        "stackable": False,
+        "slot": "helm",
+        "stats": {"defense": 5, "agility": -1},
+        "description": "A stone helmet (you're balancing a rock on your head)",
+        "rarity": "rare"
+    },
+    305: {
+        "name": "Stone Chest Armor",
+        "type": "armor",
+        "stackable": False,
+        "slot": "chest",
+        "stats": {"defense": 8, "agility": -2},
+        "description": "Stone plates protecting your vital organs (not chiropractor recommended)",
+        "rarity": "rare"
+    },
+    
+    # Materials
+    102: {
+        "name": "Goblin Ear",
+        "type": "material",
+        "stackable": True,
+        "description": "A goblin's ear (eww, but valuable)",
+        "rarity": "common"
+    },
+    103: {
+        "name": "Wolf Fang",
+        "type": "material",
+        "stackable": True,
+        "description": "A sharp wolf fang (could make a nice necklace)",
+        "rarity": "common"
+    },
 }
 
 def get_item(item_id):

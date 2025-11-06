@@ -89,6 +89,30 @@ def healthz():
 def livez():
     return 'OK', 200
 
+@app.route('/api/leaderboard', methods=['GET'])
+def leaderboard():
+    """Get top 10 living knights by level and exp"""
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        
+        cursor.execute("""
+            SELECT k.name, k.class, k.level, k.exp, u.username
+            FROM knights k
+            JOIN users u ON k.user_id = u.id
+            WHERE k.is_alive = TRUE
+            ORDER BY k.level DESC, k.exp DESC
+            LIMIT 10
+        """)
+        
+        knights = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        
+        return jsonify(knights), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/signup', methods=['POST'])
 def signup():
     data = request.json
