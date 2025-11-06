@@ -496,6 +496,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           knight_id: knightId,
+          user_id: user.id,
           difficulty: difficulty
         })
       })
@@ -580,7 +581,10 @@
         const response = await fetch(`/api/knights/${knightId}/unequip`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inventory_id: inventoryId })
+          body: JSON.stringify({ 
+            inventory_id: inventoryId,
+            user_id: user.id
+          })
         });
         
         const data = await response.json();
@@ -651,7 +655,10 @@
         const response = await fetch(`/api/knights/${knightId}/equip`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ inventory_id: inventoryId })
+          body: JSON.stringify({ 
+            inventory_id: inventoryId,
+            user_id: user.id
+          })
         });
         
         const data = await response.json();
@@ -676,7 +683,8 @@
       try {
         const response = await fetch(`/api/knights/${knightId}/sell-duplicates`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: user.id })
         });
         
         const data = await response.json();

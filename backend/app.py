@@ -30,6 +30,14 @@ def get_db_connection():
         password=os.getenv('DB_PASSWORD', 'password')
     )
 
+def verify_knight_ownership(cursor, knight_id, user_id):
+    """Verify that a knight belongs to a specific user."""
+    cursor.execute("SELECT user_id FROM knights WHERE id = %s", (knight_id,))
+    knight = cursor.fetchone()
+    if not knight:
+        return False
+    return knight['user_id'] == user_id
+
 def add_item_to_inventory(cursor, knight_id, item_id, quantity=1):
     """Add item to knight's inventory. Stacks if stackable, creates new row if not."""
     item_def = get_item(item_id)
@@ -285,13 +293,20 @@ def equip_item(knight_id):
     """Equip an item to a knight."""
     data = request.json
     inventory_id = data.get('inventory_id')
+    user_id = data.get('user_id')
     
-    if not inventory_id:
-        return jsonify({'error': 'inventory_id required'}), 400
+    if not inventory_id or not user_id:
+        return jsonify({'error': 'inventory_id and user_id required'}), 400
     
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+        
+        # Verify knight ownership
+        if not verify_knight_ownership(cursor, knight_id, user_id):
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Unauthorized: Knight does not belong to this user'}), 403
         
         # Get item from knight's inventory
         cursor.execute("""
@@ -368,13 +383,20 @@ def unequip_item(knight_id):
     """Unequip an item from a knight."""
     data = request.json
     inventory_id = data.get('inventory_id')
+    user_id = data.get('user_id')
     
-    if not inventory_id:
-        return jsonify({'error': 'inventory_id required'}), 400
+    if not inventory_id or not user_id:
+        return jsonify({'error': 'inventory_id and user_id required'}), 400
     
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+        
+        # Verify knight ownership
+        if not verify_knight_ownership(cursor, knight_id, user_id):
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Unauthorized: Knight does not belong to this user'}), 403
         
         # Verify item is equipped to this knight
         cursor.execute("""
@@ -408,9 +430,21 @@ def unequip_item(knight_id):
 @app.route('/api/knights/<int:knight_id>/sell-duplicates', methods=['POST'])
 def sell_duplicate_equipment(knight_id):
     """Sell all unequipped equipment items for gold."""
+    data = request.json
+    user_id = data.get('user_id')
+    
+    if not user_id:
+        return jsonify({'error': 'user_id required'}), 400
+    
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+        
+        # Verify knight ownership
+        if not verify_knight_ownership(cursor, knight_id, user_id):
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Unauthorized: Knight does not belong to this user'}), 403
         
         # Verify knight exists and get user_id
         cursor.execute("SELECT user_id FROM knights WHERE id = %s", (knight_id,))
@@ -544,13 +578,14 @@ def start_battle():
     
     data = request.json
     knight_id = data.get('knight_id')
+    user_id = data.get('user_id')
     difficulty = data.get('difficulty', 'easy')
     
-    logger.error(f"[BATTLE] Received: knight_id={knight_id}, difficulty={difficulty}")
+    logger.error(f"[BATTLE] Received: knight_id={knight_id}, user_id={user_id}, difficulty={difficulty}")
     sys.stderr.flush()
     
-    if not knight_id:
-        return jsonify({'error': 'knight_id required'}), 400
+    if not knight_id or not user_id:
+        return jsonify({'error': 'knight_id and user_id required'}), 400
     
     if difficulty not in ['easy', 'medium', 'hard']:
         return jsonify({'error': 'Invalid difficulty'}), 400
@@ -561,6 +596,12 @@ def start_battle():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
+        
+        # Verify knight ownership
+        if not verify_knight_ownership(cursor, knight_id, user_id):
+            cursor.close()
+            conn.close()
+            return jsonify({'error': 'Unauthorized: Knight does not belong to this user'}), 403
         
         # Get knight data
         cursor.execute(
