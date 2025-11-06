@@ -511,8 +511,8 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          knight_id: knightId,
-          user_id: user.id,
+          knight_id: parseInt(knightId),
+          user_id: parseInt(user.id),
           difficulty: difficulty
         })
       })
@@ -594,12 +594,12 @@
       if (!confirm('Unequip this item?')) return;
       
       try {
-        const response = await fetch(`/api/knights/${knightId}/unequip`, {
+        const response = await fetch(`/api/knights/${parseInt(knightId)}/unequip`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            inventory_id: inventoryId,
-            user_id: user.id
+            inventory_id: parseInt(inventoryId),
+            user_id: parseInt(user.id)
           })
         });
         
@@ -676,12 +676,12 @@
 
     async function equipItemFromInventory(inventoryId) {
       try {
-        const response = await fetch(`/api/knights/${knightId}/equip`, {
+        const response = await fetch(`/api/knights/${parseInt(knightId)}/equip`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ 
-            inventory_id: inventoryId,
-            user_id: user.id
+            inventory_id: parseInt(inventoryId),
+            user_id: parseInt(user.id)
           })
         });
         
@@ -705,10 +705,10 @@
       }
 
       try {
-        const response = await fetch(`/api/knights/${knightId}/sell-duplicates`, {
+        const response = await fetch(`/api/knights/${parseInt(knightId)}/sell-duplicates`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ user_id: user.id })
+          body: JSON.stringify({ user_id: parseInt(user.id) })
         });
         
         const data = await response.json();
@@ -782,9 +782,9 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            user_id: user.id,
-            knight_id: knightId,
-            item_id: itemId,
+            user_id: parseInt(user.id),
+            knight_id: parseInt(knightId),
+            item_id: parseInt(itemId),
             quantity: quantity
           })
         });
@@ -805,12 +805,12 @@
 
     async function usePotion(inventoryId) {
       try {
-        const response = await fetch(`/api/knights/${knightId}/use-potion`, {
+        const response = await fetch(`/api/knights/${parseInt(knightId)}/use-potion`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            user_id: user.id,
-            inventory_id: inventoryId
+            user_id: parseInt(user.id),
+            inventory_id: parseInt(inventoryId)
           })
         });
         
