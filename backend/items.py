@@ -131,6 +131,62 @@ ITEMS = {
         "rarity": "rare"
     },
     
+    # Iron Equipment (level 20-30 drops)
+    401: {
+        "name": "Iron Sword",
+        "type": "weapon",
+        "stackable": False,
+        "slot": "weapon",
+        "stats": {"attack": 18},
+        "description": "A well-forged iron blade (you called this well forged?)",
+        "rarity": "epic"
+    },
+    402: {
+        "name": "Iron Axe",
+        "type": "weapon",
+        "stackable": False,
+        "slot": "weapon",
+        "stats": {"attack": 20, "defense": -1},
+        "description": "A brutal iron axe (blunt as)",
+        "rarity": "epic"
+    },
+    403: {
+        "name": "Iron Shield",
+        "type": "armor",
+        "stackable": False,
+        "slot": "shield",
+        "stats": {"defense": 12},
+        "description": "A sturdy iron shield (built to last (thats what she said))",
+        "rarity": "epic"
+    },
+    404: {
+        "name": "Iron Helmet",
+        "type": "armor",
+        "stackable": False,
+        "slot": "helm",
+        "stats": {"defense": 9},
+        "description": "An iron helmet (proper head protection(thats what she said))",
+        "rarity": "epic"
+    },
+    405: {
+        "name": "Iron Chest Armor",
+        "type": "armor",
+        "stackable": False,
+        "slot": "chest",
+        "stats": {"defense": 14},
+        "description": "Iron plates forged into proper armor (you've played rpgs before)",
+        "rarity": "epic"
+    },
+    406: {
+        "name": "Iron Pants",
+        "type": "armor",
+        "stackable": False,
+        "slot": "pants",
+        "stats": {"defense": 10},
+        "description": "Iron leg armor (left clank right clank left clank...)",
+        "rarity": "epic"
+    },
+    
     # Materials
     102: {
         "name": "Goblin Ear",
@@ -145,6 +201,13 @@ ITEMS = {
         "stackable": True,
         "description": "A sharp wolf fang (could make a nice necklace)",
         "rarity": "common"
+    },
+    104: {
+        "name": "Orc Tusk",
+        "type": "material",
+        "stackable": True,
+        "description": "A massive orc tusk (worth a fortune)",
+        "rarity": "rare"
     },
 }
 

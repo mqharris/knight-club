@@ -86,9 +86,9 @@ MONSTERS = {
             gold_drop=(25, 60),
             loot_table=[
                 (103, 0.75),  # 75% Wolf Fang
-                (301, 0.20),  # 20% Stone Sword
-                (302, 0.15),  # 15% Stone Axe
-                (303, 0.10),  # 10% Stone Shield
+                (301, 0.020),  # 20% Stone Sword
+                (302, 0.015),  # 15% Stone Axe
+                (303, 0.010),  # 10% Stone Shield
             ]
         ),
         Monster(
@@ -100,11 +100,11 @@ MONSTERS = {
             xp_reward=50,
             gold_drop=(30, 70),
             loot_table=[
-                (102, 0.90),  # 90% Goblin Ear
-                (301, 0.25),  # 25% Stone Sword
-                (303, 0.20),  # 20% Stone Shield
-                (304, 0.15),  # 15% Stone Helmet
-                (305, 0.10),  # 10% Stone Chest Armor
+                (102, 0.090),  # 90% Goblin Ear
+                (301, 0.025),  # 25% Stone Sword
+                (303, 0.020),  # 20% Stone Shield
+                (304, 0.015),  # 15% Stone Helmet
+                (305, 0.010),  # 10% Stone Chest Armor
             ]
         ),
         Monster(
@@ -116,10 +116,10 @@ MONSTERS = {
             xp_reward=60,
             gold_drop=(40, 80),
             loot_table=[
-                (302, 0.30),  # 30% Stone Axe
-                (301, 0.25),  # 25% Stone Sword
-                (305, 0.20),  # 20% Stone Chest Armor
-                (303, 0.15),  # 15% Stone Shield
+                (302, 0.030),  # 30% Stone Axe
+                (301, 0.025),  # 25% Stone Sword
+                (305, 0.020),  # 20% Stone Chest Armor
+                (303, 0.015),  # 15% Stone Shield
             ]
         ),
     ],
@@ -133,10 +133,13 @@ MONSTERS = {
             xp_reward=100,
             gold_drop=(60, 120),
             loot_table=[
-                (302, 0.40),  # 40% Stone Axe
-                (301, 0.35),  # 35% Stone Sword
-                (305, 0.30),  # 30% Stone Chest Armor
-                (304, 0.25),  # 25% Stone Helmet
+                (104, 0.80),  # 80% Orc Tusk
+                (401, 0.40),  # 40% Iron Sword
+                (402, 0.35),  # 35% Iron Axe
+                (403, 0.30),  # 30% Iron Shield
+                (404, 0.25),  # 25% Iron Helmet
+                (405, 0.25),  # 25% Iron Chest Armor
+                (406, 0.20),  # 20% Iron Pants
             ]
         ),
     ]

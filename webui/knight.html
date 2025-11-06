@@ -205,9 +205,11 @@
           <p><strong>Age:</strong> <span id="knightAge"></span></p>
         </div>
       </div>
-      <div style="display: flex; gap: 10px;">
-        <button class="battle-btn" onclick="startBattle()">⚔️ BATTLE</button>
-        <button class="battle-btn" style="background: #667eea;" onclick="openInventory()">🎒 INVENTORY</button>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="battle-btn" onclick="startBattle('easy')" style="flex: 1; min-width: 150px;">⚔️ EASY</button>
+        <button class="battle-btn" onclick="startBattle('medium')" style="flex: 1; min-width: 150px; background: #f39c12;">⚔️ MEDIUM</button>
+        <button class="battle-btn" onclick="startBattle('hard')" style="flex: 1; min-width: 150px; background: #e74c3c;">⚔️ HARD</button>
+        <button class="battle-btn" style="background: #667eea; flex: 1; min-width: 150px;" onclick="openInventory()">🎒 INVENTORY</button>
       </div>
     </div>
 
@@ -327,10 +329,17 @@
       if (isDead) {
         document.querySelector('.knight-header').style.opacity = '0.6';
         document.querySelector('.knight-header').style.filter = 'grayscale(100%)';
-        document.querySelector('.battle-btn').disabled = true;
-        document.querySelector('.battle-btn').style.background = '#999';
-        document.querySelector('.battle-btn').style.cursor = 'not-allowed';
-        document.querySelector('.battle-btn').textContent = '⚰️ DECEASED';
+        
+        // Disable all battle buttons
+        const battleBtns = document.querySelectorAll('.battle-btn');
+        battleBtns.forEach(btn => {
+          if (btn.textContent.includes('⚔️')) {
+            btn.disabled = true;
+            btn.style.background = '#999';
+            btn.style.cursor = 'not-allowed';
+            btn.textContent = '⚰️ DECEASED';
+          }
+        });
       }
       
       displayEquipment();
@@ -391,9 +400,46 @@
     function displayStats() {
       const container = document.getElementById('statsGrid');
       
-      container.innerHTML = Object.entries(stats).map(([stat, value]) => `
+      // Calculate level bonus (each level after 1 adds +1 to all stats)
+      const level = knightData.level || 1;
+      const levelBonus = level - 1;
+      
+      // Base stats start at 10, add level bonus
+      const baseAttack = 10 + levelBonus;
+      const baseDefense = 10 + levelBonus;
+      const baseAgility = 10 + levelBonus;
+      const baseIntelligence = 10 + levelBonus;
+      
+      // Calculate equipment bonuses
+      let equipmentAttack = 0;
+      let equipmentDefense = 0;
+      let equipmentAgility = 0;
+      
+      if (knightData.equipment) {
+        knightData.equipment.forEach(item => {
+          if (item.stats) {
+            equipmentAttack += item.stats.attack || 0;
+            equipmentDefense += item.stats.defense || 0;
+            equipmentAgility += item.stats.agility || 0;
+          }
+        });
+      }
+      
+      // Total stats
+      const totalAttack = baseAttack + equipmentAttack;
+      const totalDefense = baseDefense + equipmentDefense;
+      const totalAgility = baseAgility + equipmentAgility;
+      
+      const statsDisplay = {
+        'Strength': totalAttack + (equipmentAttack > 0 ? ` <span style="color: #27ae60;">(+${equipmentAttack})</span>` : ''),
+        'Defense': totalDefense + (equipmentDefense > 0 ? ` <span style="color: #27ae60;">(+${equipmentDefense})</span>` : ''),
+        'Agility': totalAgility + (equipmentAgility > 0 ? ` <span style="color: #27ae60;">(+${equipmentAgility})</span>` : ''),
+        'Intelligence': baseIntelligence
+      };
+      
+      container.innerHTML = Object.entries(statsDisplay).map(([stat, value]) => `
         <div class="stat-item">
-          <div class="stat-label">${stat.charAt(0).toUpperCase() + stat.slice(1)}</div>
+          <div class="stat-label">${stat}</div>
           <div class="stat-value">${value}</div>
         </div>
       `).join('');
@@ -414,7 +460,7 @@
       document.getElementById('expText').textContent = `${exp} XP`;
     }
 
-    function startBattle() {
+    function startBattle(difficulty = 'easy') {
       if (!knightData.is_alive) {
         alert('This knight has fallen and cannot battle.');
         return;
@@ -425,17 +471,24 @@
         return;
       }
       
-      // Simple difficulty selector (only Easy for now)
-      const difficulty = 'easy';
+      const difficultyLabels = {
+        'easy': 'Easy (Slimes, Rats, Weak Goblins)',
+        'medium': 'Medium (Wolves, Goblin Warriors, Troglodites)',
+        'hard': 'Hard (Orcs)'
+      };
       
-      if (!confirm(`Send ${knightData.name} into battle? (Difficulty: Easy - Level 1 Slime)`)) {
+      if (!confirm(`Send ${knightData.name} into battle?\n\nDifficulty: ${difficultyLabels[difficulty]}\n\n⚠️ Warning: Death is permanent!`)) {
         return;
       }
       
-      // Disable button during battle
-      const battleBtn = document.querySelector('.battle-btn');
-      battleBtn.disabled = true;
-      battleBtn.textContent = '⚔️ BATTLING...';
+      // Disable all battle buttons during battle
+      const battleBtns = document.querySelectorAll('.battle-btn');
+      battleBtns.forEach(btn => {
+        if (btn.textContent.includes('⚔️')) {
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+        }
+      });
       
       fetch('/api/battle', {
         method: 'POST',
@@ -447,8 +500,13 @@
       })
       .then(response => response.json())
       .then(data => {
-        battleBtn.disabled = false;
-        battleBtn.textContent = '⚔️ BATTLE';
+        // Re-enable all battle buttons
+        battleBtns.forEach(btn => {
+          if (btn.textContent.includes('⚔️')) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+          }
+        });
         
         if (data.error) {
           alert('Battle error: ' + data.error);
