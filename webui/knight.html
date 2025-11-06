@@ -498,6 +498,13 @@
         return;
       }
       
+      // Debug logging
+      console.log('Battle request:', {
+        knight_id: knightId,
+        user_id: user?.id,
+        difficulty: difficulty
+      });
+      
       // Disable all battle buttons during battle
       const battleBtns = document.querySelectorAll('.battle-btn');
       battleBtns.forEach(btn => {
@@ -511,8 +518,8 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          knight_id: parseInt(knightId),
-          user_id: parseInt(user.id),
+          knight_id: Number(knightId),
+          user_id: Number(user.id),
           difficulty: difficulty
         })
       })
