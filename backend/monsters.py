@@ -33,7 +33,7 @@ MONSTERS = {
             defense=2,
             agility=5,
             xp_reward=10,
-            gold_drop=(5, 20),
+            gold_drop=(1, 2),
             loot_table=[
                 (101, 0.70),  # 70% Slime Residue
                 (201, 0.10),  # 10% Wooden Sword
@@ -50,7 +50,7 @@ MONSTERS = {
             defense=3,
             agility=8,
             xp_reward=15,
-            gold_drop=(8, 25),
+            gold_drop=(1, 3),
             loot_table=[
                 (101, 0.40),  # 40% Slime Residue
                 (201, 0.15),  # 15% Wooden Sword
@@ -67,7 +67,7 @@ MONSTERS = {
             defense=4,
             agility=6,
             xp_reward=20,
-            gold_drop=(10, 30),
+            gold_drop=(1, 3),
             loot_table=[
                 (102, 0.80),  # 80% Goblin Ear
                 (201, 0.15),  # 15% Wooden Sword
@@ -85,7 +85,7 @@ MONSTERS = {
             defense=6,
             agility=12,
             xp_reward=40,
-            gold_drop=(25, 60),
+            gold_drop=(3, 6),
             loot_table=[
                 (103, 0.75),  # 75% Wolf Fang
                 (301, 0.08),  # 8% Stone Sword (was 2%)
@@ -100,7 +100,7 @@ MONSTERS = {
             defense=8,
             agility=10,
             xp_reward=50,
-            gold_drop=(30, 70),
+            gold_drop=(3, 7),
             loot_table=[
                 (102, 0.90),  # 90% Goblin Ear
                 (301, 0.10),  # 10% Stone Sword (was 2.5%)
@@ -116,7 +116,7 @@ MONSTERS = {
             defense=10,
             agility=6,
             xp_reward=55,
-            gold_drop=(35, 75),
+            gold_drop=(4, 8),
             loot_table=[
                 (302, 0.12),  # 12% Stone Axe (was 3%)
                 (301, 0.10),  # 10% Stone Sword (was 2.5%)
@@ -133,7 +133,7 @@ MONSTERS = {
             defense=15,
             agility=8,
             xp_reward=100,
-            gold_drop=(60, 120),
+            gold_drop=(6, 12),
             loot_table=[
                 (104, 0.80),  # 80% Orc Tusk
                 (401, 0.16),  # 16% Iron Sword (was 4%)

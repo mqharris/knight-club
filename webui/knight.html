@@ -447,10 +447,20 @@
       const totalDefense = baseDefense + equipmentDefense;
       const totalAgility = baseAgility + equipmentAgility;
       
+      // Helper function to display bonuses (positive in green, negative in red)
+      const displayBonus = (bonus) => {
+        if (bonus > 0) {
+          return ` <span style="color: #27ae60;">(+${bonus})</span>`;
+        } else if (bonus < 0) {
+          return ` <span style="color: #e74c3c;">(${bonus})</span>`;
+        }
+        return '';
+      };
+      
       const statsDisplay = {
-        'Strength': totalAttack + (equipmentAttack > 0 ? ` <span style="color: #27ae60;">(+${equipmentAttack})</span>` : ''),
-        'Defense': totalDefense + (equipmentDefense > 0 ? ` <span style="color: #27ae60;">(+${equipmentDefense})</span>` : ''),
-        'Agility': totalAgility + (equipmentAgility > 0 ? ` <span style="color: #27ae60;">(+${equipmentAgility})</span>` : ''),
+        'Strength': totalAttack + displayBonus(equipmentAttack),
+        'Defense': totalDefense + displayBonus(equipmentDefense),
+        'Agility': totalAgility + displayBonus(equipmentAgility),
         'Intelligence': baseIntelligence
       };
       
