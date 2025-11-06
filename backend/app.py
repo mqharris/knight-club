@@ -457,7 +457,8 @@ def get_inventory():
                     'stackable': item_def['stackable'],
                     'stats': item_def.get('stats', {}),
                     'slot': item_def.get('slot'),
-                    'rarity': item_def.get('rarity', 'common')
+                    'rarity': item_def.get('rarity', 'common'),
+                    'description': item_def.get('description', '')
                 })
         
         return jsonify({
