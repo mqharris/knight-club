@@ -40,6 +40,7 @@ MONSTERS = {
                 (202, 0.10),  # 10% Wooden Shield
                 (203, 0.05),  # 5% Wooden Helmet
                 (204, 0.05),  # 5% Wooden Chest Armor
+                (205, 0.05),  # 5% Wooden Pants
             ]
         ),
         Monster(
@@ -56,6 +57,7 @@ MONSTERS = {
                 (206, 0.10),  # 10% Wooden Bow
                 (208, 0.10),  # 10% Wooden Dagger
                 (202, 0.10),  # 10% Wooden Shield
+                (205, 0.08),  # 8% Wooden Pants
             ]
         ),
         Monster(
