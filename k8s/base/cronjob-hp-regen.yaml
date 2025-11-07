@@ -1,0 +1,24 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: hp-regen
+spec:
+  # Run every 15 minutes
+  schedule: "*/15 * * * *"
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: regen
+              image: curlimages/curl:latest
+              command:
+                - sh
+                - -c
+                - |
+                  curl -X POST http://backend:8080/api/regen \
+                    -H "Content-Type: application/json" \
+                    -f || exit 1

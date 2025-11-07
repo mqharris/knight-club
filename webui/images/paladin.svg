@@ -1,0 +1,29 @@
+<svg width="160" height="160" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="160" height="160" fill="#f39c12"/>
+  
+  <!-- Paladin body -->
+  <rect x="60" y="80" width="40" height="50" fill="#ecf0f1"/>
+  
+  <!-- Paladin helmet with cross -->
+  <rect x="55" y="50" width="50" height="35" fill="#f1c40f"/>
+  <rect x="78" y="55" width="4" height="15" fill="#e74c3c"/>
+  <rect x="73" y="60" width="14" height="4" fill="#e74c3c"/>
+  
+  <!-- Holy mace -->
+  <circle cx="110" cy="95" r="8" fill="#ecf0f1"/>
+  <rect x="108" y="95" width="4" height="25" fill="#bdc3c7"/>
+  <polygon points="110,88 113,93 107,93" fill="#f39c12"/>
+  
+  <!-- Shield with cross -->
+  <ellipse cx="45" cy="95" rx="12" ry="18" fill="#ecf0f1"/>
+  <rect x="43" y="85" width="4" height="20" fill="#e74c3c"/>
+  <rect x="37" y="93" width="16" height="4" fill="#e74c3c"/>
+  
+  <!-- Legs -->
+  <rect x="65" y="130" width="12" height="25" fill="#bdc3c7"/>
+  <rect x="83" y="130" width="12" height="25" fill="#bdc3c7"/>
+  
+  <!-- Class label -->
+  <text x="80" y="20" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">PALADIN</text>
+</svg>

@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Knight Club - Login</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+    .container {
+      background: white;
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      width: 350px;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      color: #555;
+      font-weight: 600;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 5px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #5568d3;
+    }
+    .switch {
+      text-align: center;
+      margin-top: 20px;
+      color: #666;
+    }
+    .switch a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .message {
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .error {
+      background: #fee;
+      color: #c33;
+    }
+    .success {
+      background: #efe;
+      color: #3c3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>KNIGHT CLUB <span style="font-size: 14px; color: #999; font-weight: normal; display: block; margin-top: 5px;">v0.2.0</span></h1>
+    <div id="message"></div>
+    <form id="authForm">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" required>
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" required>
+      </div>
+      <button type="submit" id="submitBtn">Login</button>
+    </form>
+    <div class="switch">
+      <span id="switchText">Don't have an account? <a href="#" id="switchLink">Sign Up</a></span>
+    </div>
+  </div>
+  <script>
+    let isLogin = true;
+    const form = document.getElementById('authForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const switchText = document.getElementById('switchText');
+    const messageDiv = document.getElementById('message');
+
+    function setMode(loginMode) {
+      isLogin = loginMode;
+      if (isLogin) {
+        submitBtn.textContent = 'Login';
+        switchText.innerHTML = 'Don\'t have an account? <a href="#" id="switchLink">Sign Up</a>';
+      } else {
+        submitBtn.textContent = 'Sign Up';
+        switchText.innerHTML = 'Already have an account? <a href="#" id="switchLink">Login</a>';
+      }
+      document.getElementById('switchLink').addEventListener('click', switchMode);
+    }
+
+    function switchMode(e) {
+      e.preventDefault();
+      setMode(!isLogin);
+      messageDiv.innerHTML = '';
+    }
+
+    document.getElementById('switchLink').addEventListener('click', switchMode);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const endpoint = isLogin ? '/api/login' : '/api/signup';
+
+      try {
+        // relative URL so it hits ingress on the same host
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          messageDiv.innerHTML = `<div class="message success">${data.message}</div>`;
+          
+          if (isLogin) {
+            // Save user info and redirect to dashboard
+            localStorage.setItem('knightclub_user', JSON.stringify({
+              username: username,
+              user_id: data.user_id
+            }));
+            setTimeout(() => {
+              window.location.href = '/dashboard.html';
+            }, 1000);
+          } else {
+            // After signup, switch to login mode
+            setTimeout(() => {
+              setMode(true);
+              messageDiv.innerHTML = '<div class="message success">Account created! Please log in.</div>';
+            }, 1500);
+          }
+        } else {
+          messageDiv.innerHTML = `<div class="message error">${data.error}</div>`;
+        }
+      } catch (error) {
+        messageDiv.innerHTML = `<div class="message error">Connection error. Please try again.</div>`;
+      }
+    });
+
+    // init
+    setMode(true);
+  </script>
+</body>
+</html>

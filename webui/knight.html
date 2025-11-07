@@ -1,0 +1,865 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Knight Club - Knight Details</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+    }
+    .navbar {
+      background: white;
+      padding: 15px 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    .navbar h1 {
+      margin: 0;
+      color: #333;
+      font-size: 24px;
+    }
+    .navbar .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar a {
+      color: #667eea;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .navbar button {
+      padding: 8px 20px;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .content {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .knight-header {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .knight-header-left {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .knight-avatar {
+      width: 120px;
+      height: 120px;
+      border-radius: 10px;
+      border: 3px solid #667eea;
+    }
+    .knight-info h2 {
+      margin: 0 0 10px 0;
+      color: #333;
+    }
+    .knight-info p {
+      margin: 5px 0;
+      color: #666;
+    }
+    .battle-btn {
+      padding: 15px 40px;
+      background: #e74c3c;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 18px;
+      box-shadow: 0 4px 10px rgba(231, 76, 60, 0.3);
+    }
+    .battle-btn:hover {
+      background: #c0392b;
+    }
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .card h3 {
+      margin: 0 0 20px 0;
+      color: #333;
+      border-bottom: 2px solid #667eea;
+      padding-bottom: 10px;
+    }
+    .equipment-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .equipment-slot {
+      background: #f5f7fa;
+      padding: 15px;
+      border-radius: 5px;
+      border: 2px solid #ddd;
+    }
+    .equipment-slot.empty {
+      opacity: 0.6;
+    }
+    .slot-name {
+      font-weight: 600;
+      color: #667eea;
+      margin-bottom: 5px;
+      text-transform: capitalize;
+    }
+    .slot-item {
+      color: #666;
+      font-size: 14px;
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+    .stat-item {
+      background: #f5f7fa;
+      padding: 15px;
+      border-radius: 5px;
+    }
+    .stat-label {
+      font-weight: 600;
+      color: #555;
+      font-size: 14px;
+      margin-bottom: 5px;
+    }
+    .stat-value {
+      font-size: 24px;
+      color: #667eea;
+      font-weight: 700;
+    }
+    .hp-bar {
+      background: #f5f7fa;
+      padding: 20px;
+      border-radius: 5px;
+      margin-top: 15px;
+    }
+    .hp-label {
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+    }
+    .hp-bar-container {
+      background: #ddd;
+      height: 30px;
+      border-radius: 15px;
+      overflow: hidden;
+    }
+    .hp-bar-fill {
+      background: linear-gradient(90deg, #e74c3c 0%, #c0392b 100%);
+      height: 100%;
+      transition: width 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>🛡️ KNIGHT CLUB</h1>
+    <div class="nav-links">
+      <a href="/dashboard.html">← Back to Dashboard</a>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="knight-header">
+      <div class="knight-header-left">
+        <img id="knightAvatar" class="knight-avatar" src="" alt="Knight">
+        <div class="knight-info" id="knightInfo">
+          <h2 id="knightName">Loading...</h2>
+          <p><strong>Class:</strong> <span id="knightClass"></span></p>
+          <p><strong>Level:</strong> <span id="knightLevel"></span></p>
+          <p><strong>Age:</strong> <span id="knightAge"></span></p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="battle-btn" onclick="startBattle('easy')" style="flex: 1; min-width: 150px;">⚔️ EASY</button>
+        <button class="battle-btn" onclick="startBattle('medium')" style="flex: 1; min-width: 150px; background: #f39c12;">⚔️ MEDIUM</button>
+        <button class="battle-btn" onclick="startBattle('hard')" style="flex: 1; min-width: 150px; background: #e74c3c;">⚔️ HARD</button>
+        <button class="battle-btn" style="background: #667eea; flex: 1; min-width: 150px;" onclick="openInventory()">🎒 INVENTORY</button>
+        <button class="battle-btn" style="background: #27ae60; flex: 1; min-width: 150px;" onclick="openShop()">🏪 SHOP</button>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="card">
+        <h3>Equipment</h3>
+        <div class="equipment-grid" id="equipmentGrid"></div>
+      </div>
+
+      <div class="card">
+        <h3>Stats</h3>
+        <div class="stats-grid" id="statsGrid"></div>
+        
+        <div class="hp-bar">
+          <div class="hp-label">
+            <span>Hit Points</span>
+            <span id="hpText">100 / 100</span>
+          </div>
+          <div class="hp-bar-container">
+            <div class="hp-bar-fill" id="hpBarFill" style="width: 100%;">
+              100%
+            </div>
+          </div>
+          <div style="font-size: 11px; color: #888; margin-top: 5px; text-align: center;">
+            ❤️ Regenerates 1 HP every 15 minutes
+          </div>
+        </div>
+        
+        <div class="hp-bar">
+          <div class="hp-label">
+            <span>Experience</span>
+            <span id="expText">0 XP</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Inventory Modal -->
+  <div id="inventoryModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="max-width: 800px; margin: 40px auto; background: white; border-radius: 10px; padding: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">🎒 Inventory</h2>
+        <button onclick="closeInventory()" style="padding: 8px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+      </div>
+      <div style="margin-bottom: 20px; padding: 15px; background: #f5f7fa; border-radius: 5px; display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="margin: 0;">💰 Gold: <span id="inventoryGold">0</span></h3>
+        <button onclick="sellDuplicates()" style="padding: 10px 20px; background: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">💎 Sell Duplicate Equipment</button>
+      </div>
+      <h3>Items</h3>
+      <div id="inventoryItems"></div>
+    </div>
+  </div>
+
+  <!-- Shop Modal -->
+  <div id="shopModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="max-width: 800px; margin: 40px auto; background: white; border-radius: 10px; padding: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">🏪 Shop</h2>
+        <button onclick="closeShop()" style="padding: 8px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+      </div>
+      <div style="margin-bottom: 20px; padding: 15px; background: #f5f7fa; border-radius: 5px;">
+        <h3 style="margin: 0;">💰 Gold: <span id="shopGold">0</span></h3>
+      </div>
+      <h3>Items for Sale</h3>
+      <div id="shopItems"></div>
+    </div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    const user = JSON.parse(localStorage.getItem('knightclub_user') || 'null');
+    if (!user) {
+      window.location.href = '/';
+    }
+
+    // Get knight ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const knightId = urlParams.get('id');
+    if (!knightId) {
+      window.location.href = '/dashboard.html';
+    }
+
+    let knightData = null;
+
+    // Equipment slots
+    const equipmentSlots = [
+      'weapon', 'shield', 'helm', 'chest', 'cape', 'belt', 
+      'gloves', 'pants', 'boots', 'ring', 'ring'
+    ];
+
+    // Base stats
+    const stats = {
+      strength: 10,
+      defense: 10,
+      agility: 10,
+      intelligence: 10
+    };
+
+    function logout() {
+      localStorage.removeItem('knightclub_user');
+      window.location.href = '/';
+    }
+
+    async function loadKnight() {
+      try {
+        const response = await fetch(`/api/knights/${knightId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          knightData = data.knight;
+          displayKnight();
+        } else {
+          alert('Failed to load knight');
+          window.location.href = '/dashboard.html';
+        }
+      } catch (error) {
+        alert('Connection error');
+        window.location.href = '/dashboard.html';
+      }
+    }
+
+    function displayKnight() {
+      const isDead = !knightData.is_alive;
+      
+      document.getElementById('knightName').textContent = knightData.name + (isDead ? ' 💀' : '');
+      document.getElementById('knightClass').textContent = knightData.class;
+      document.getElementById('knightLevel').textContent = knightData.level;
+      document.getElementById('knightAge').textContent = calculateAge(knightData.created_at);
+      document.getElementById('knightAvatar').src = `/images/${knightData.class}.svg`;
+      
+      // Grey out and disable if dead
+      if (isDead) {
+        document.querySelector('.knight-header').style.opacity = '0.6';
+        document.querySelector('.knight-header').style.filter = 'grayscale(100%)';
+        
+        // Disable all battle buttons
+        const battleBtns = document.querySelectorAll('.battle-btn');
+        battleBtns.forEach(btn => {
+          if (btn.textContent.includes('⚔️')) {
+            btn.disabled = true;
+            btn.style.background = '#999';
+            btn.style.cursor = 'not-allowed';
+            btn.textContent = '⚰️ DECEASED';
+          }
+        });
+      }
+      
+      displayEquipment();
+      displayStats();
+      displayHP();
+      displayExp();
+    }
+
+    function calculateAge(created_at) {
+      const created = new Date(created_at);
+      const now = new Date();
+      const days = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+      
+      if (days === 0) return 'Less than 1 day';
+      if (days === 1) return '1 day';
+      return `${days} days`;
+    }
+
+    function displayEquipment() {
+      const container = document.getElementById('equipmentGrid');
+      const equipment = knightData.equipment || [];
+      
+      // Create a map of equipped items by slot
+      const equippedBySlot = {};
+      equipment.forEach(item => {
+        if (item.slot) {
+          equippedBySlot[item.slot] = item;
+        }
+      });
+      
+      container.innerHTML = equipmentSlots.map((slot, index) => {
+        const slotName = slot === 'ring' ? `Ring ${index === 7 ? '1' : '2'}` : slot;
+        const equippedItem = equippedBySlot[slot];
+        
+        if (equippedItem) {
+          const statsText = Object.entries(equippedItem.stats || {})
+            .map(([key, val]) => `${key}: +${val}`)
+            .join(', ');
+          
+          return `
+            <div class="equipment-slot filled" onclick="unequipItem(${equippedItem.inventory_id})" style="cursor: pointer;">
+              <div class="slot-name">${slotName}</div>
+              <div class="slot-item" style="color: #667eea; font-weight: 600;">${equippedItem.name}</div>
+              ${statsText ? `<div style="font-size: 11px; color: #27ae60;">${statsText}</div>` : ''}
+            </div>
+          `;
+        } else {
+          return `
+            <div class="equipment-slot empty">
+              <div class="slot-name">${slotName}</div>
+              <div class="slot-item">Empty</div>
+            </div>
+          `;
+        }
+      }).join('');
+    }
+
+    function displayStats() {
+      const container = document.getElementById('statsGrid');
+      
+      // Calculate level bonus (each level after 1 adds +1 to all stats)
+      const level = knightData.level || 1;
+      const levelBonus = level - 1;
+      
+      // Base stats start at 10, add level bonus
+      const baseAttack = 10 + levelBonus;
+      const baseDefense = 10 + levelBonus;
+      const baseAgility = 10 + levelBonus;
+      const baseIntelligence = 10 + levelBonus;
+      
+      // Calculate equipment bonuses
+      let equipmentAttack = 0;
+      let equipmentDefense = 0;
+      let equipmentAgility = 0;
+      
+      if (knightData.equipment) {
+        knightData.equipment.forEach(item => {
+          if (item.stats) {
+            equipmentAttack += item.stats.attack || 0;
+            equipmentDefense += item.stats.defense || 0;
+            equipmentAgility += item.stats.agility || 0;
+          }
+        });
+      }
+      
+      // Total stats
+      const totalAttack = baseAttack + equipmentAttack;
+      const totalDefense = baseDefense + equipmentDefense;
+      const totalAgility = baseAgility + equipmentAgility;
+      
+      // Helper function to display bonuses (positive in green, negative in red)
+      const displayBonus = (bonus) => {
+        if (bonus > 0) {
+          return ` <span style="color: #27ae60;">(+${bonus})</span>`;
+        } else if (bonus < 0) {
+          return ` <span style="color: #e74c3c;">(${bonus})</span>`;
+        }
+        return '';
+      };
+      
+      const statsDisplay = {
+        'Strength': totalAttack + displayBonus(equipmentAttack),
+        'Defense': totalDefense + displayBonus(equipmentDefense),
+        'Agility': totalAgility + displayBonus(equipmentAgility),
+        'Intelligence': baseIntelligence
+      };
+      
+      container.innerHTML = Object.entries(statsDisplay).map(([stat, value]) => `
+        <div class="stat-item">
+          <div class="stat-label">${stat}</div>
+          <div class="stat-value">${value}</div>
+        </div>
+      `).join('');
+    }
+
+    function displayHP() {
+      const currentHP = knightData.current_hp;
+      const maxHP = knightData.max_hp;
+      const percentage = (currentHP / maxHP) * 100;
+      
+      document.getElementById('hpText').textContent = `${currentHP} / ${maxHP}`;
+      document.getElementById('hpBarFill').style.width = `${percentage}%`;
+      document.getElementById('hpBarFill').textContent = `${Math.round(percentage)}%`;
+    }
+
+    function displayExp() {
+      const exp = knightData.exp || 0;
+      document.getElementById('expText').textContent = `${exp} XP`;
+    }
+
+    function startBattle(difficulty = 'easy') {
+      if (!knightData.is_alive) {
+        alert('This knight has fallen and cannot battle.');
+        return;
+      }
+      
+      if (knightData.current_hp <= 0) {
+        alert('Knight has no HP! Wait for regeneration.');
+        return;
+      }
+      
+      const difficultyLabels = {
+        'easy': 'Easy (Slimes, Rats, Weak Goblins)',
+        'medium': 'Medium (Wolves, Goblin Warriors, Troglodites)',
+        'hard': 'Hard (Orcs)'
+      };
+      
+      if (!confirm(`Send ${knightData.name} into battle?\n\nDifficulty: ${difficultyLabels[difficulty]}\n\n⚠️ Warning: Death is permanent!`)) {
+        return;
+      }
+      
+      // Debug logging
+      console.log('Battle request:', {
+        knight_id: knightId,
+        user_id: user?.user_id,
+        difficulty: difficulty
+      });
+      
+      // Disable all battle buttons during battle
+      const battleBtns = document.querySelectorAll('.battle-btn');
+      battleBtns.forEach(btn => {
+        if (btn.textContent.includes('⚔️')) {
+          btn.disabled = true;
+          btn.style.opacity = '0.5';
+        }
+      });
+      
+      fetch('/api/battle', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          knight_id: Number(knightId),
+          user_id: Number(user.user_id),
+          difficulty: difficulty
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Re-enable all battle buttons
+        battleBtns.forEach(btn => {
+          if (btn.textContent.includes('⚔️')) {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+          }
+        });
+        
+        if (data.error) {
+          alert('Battle error: ' + data.error);
+          return;
+        }
+        
+        // Show battle log
+        const logText = data.log.join('\n');
+        let resultMessage = `BATTLE RESULTS:\n\n${logText}`;
+        
+        // Add loot information if victory
+        if (data.result === 'victory' && data.loot) {
+          resultMessage += `\n\n💰 LOOT COLLECTED 💰`;
+          resultMessage += `\n Gold: ${data.loot.gold}`;
+          if (data.loot.items.length > 0) {
+            resultMessage += `\n Items:`;
+            data.loot.items.forEach(item => {
+              resultMessage += `\n  - ${item.name}`;
+            });
+          }
+        }
+        
+        alert(resultMessage);
+        
+        // Check for level up
+        const oldLevel = knightData.level;
+        const oldExp = knightData.exp || 0;
+        
+        // Update knight HP and alive status
+        knightData.current_hp = data.knight_hp;
+        knightData.is_alive = data.knight_alive;
+        
+        // Update XP if provided
+        if (data.exp !== undefined) {
+          knightData.exp = data.exp;
+        }
+        
+        // Calculate new level based on total XP
+        const newLevel = Math.floor(knightData.exp / 100) + 1;
+        
+        // Check if leveled up
+        if (newLevel > oldLevel && knightData.is_alive) {
+          knightData.level = newLevel;
+          alert(`🎉 CONGRATULATIONS! 🎉\n\n${knightData.name} has reached Level ${newLevel}!`);
+        }
+        
+        // If knight died, update display
+        if (!data.knight_alive) {
+          displayKnight(); // Re-render with death state
+        } else {
+          displayHP(); // Just update HP bar
+          displayExp(); // Update XP display
+          // Update level display if it changed
+          if (newLevel > oldLevel) {
+            document.getElementById('knightLevel').textContent = newLevel;
+          }
+        }
+      })
+      .catch(error => {
+        battleBtn.disabled = false;
+        battleBtn.textContent = '⚔️ BATTLE';
+        alert('Connection error: ' + error);
+      });
+    }
+
+    async function unequipItem(inventoryId) {
+      if (!confirm('Unequip this item?')) return;
+      
+      try {
+        const response = await fetch(`/api/knights/${parseInt(knightId)}/unequip`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            inventory_id: parseInt(inventoryId),
+            user_id: parseInt(user.user_id)
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('Item unequipped!');
+          loadKnight(); // Reload to show updated equipment
+        } else {
+          alert('Error: ' + (data.error || 'Failed to unequip item'));
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    async function openInventory() {
+      try {
+        const response = await fetch(`/api/inventory?knight_id=${knightId}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          document.getElementById('inventoryGold').textContent = data.gold;
+          displayInventory(data.items);
+          document.getElementById('inventoryModal').style.display = 'block';
+        } else {
+          alert('Error loading inventory');
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    function closeInventory() {
+      document.getElementById('inventoryModal').style.display = 'none';
+    }
+
+    function displayInventory(items) {
+      const container = document.getElementById('inventoryItems');
+      
+      if (items.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999;">No items</p>';
+        return;
+      }
+      
+      // Group stackable items, separate non-stackable
+      container.innerHTML = items.map(item => {
+        const isEquipped = item.is_equipped === true || item.is_equipped === 1;
+        const statsText = Object.entries(item.stats || {})
+          .map(([key, val]) => `${key}: +${val}`)
+          .join(', ');
+        
+        // Determine action button
+        let actionButton = '';
+        if (item.type === 'consumable') {
+          actionButton = `<button onclick="usePotion(${item.id})" style="padding: 8px 16px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Use</button>`;
+        } else if (!item.stackable && !isEquipped) {
+          actionButton = `<button onclick="equipItemFromInventory(${item.id})" style="padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">Equip</button>`;
+        }
+        
+        return `
+          <div style="padding: 15px; background: ${isEquipped ? '#d4edda' : '#f5f7fa'}; border: ${isEquipped ? '2px solid #28a745' : '1px solid #e0e0e0'}; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; ${isEquipped ? 'box-shadow: 0 2px 8px rgba(40, 167, 69, 0.2);' : ''}">
+            <div style="flex: 1;">
+              <strong style="${isEquipped ? 'color: #155724;' : ''}">${item.name}</strong> ${item.stackable ? `(x${item.quantity})` : ''}
+              <div style="font-size: 12px; color: #666;">${item.type} ${statsText ? `• ${statsText}` : ''}</div>
+              ${item.description ? `<div style="font-size: 11px; color: #888; font-style: italic; margin-top: 4px;">${item.description}</div>` : ''}
+              ${isEquipped ? '<div style="font-size: 11px; color: #28a745; font-weight: bold; margin-top: 4px;">⚔️ EQUIPPED</div>' : ''}
+            </div>
+            ${actionButton}
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function equipItemFromInventory(inventoryId) {
+      try {
+        const response = await fetch(`/api/knights/${parseInt(knightId)}/equip`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            inventory_id: parseInt(inventoryId),
+            user_id: parseInt(user.user_id)
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert('Item equipped!');
+          closeInventory();
+          loadKnight(); // Reload to show updated equipment
+        } else {
+          alert('Error: ' + (data.error || 'Failed to equip item'));
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    async function sellDuplicates() {
+      if (!confirm('Sell all unequipped equipment for gold?\n\nWooden: 10g each\nStone: 40g each\nIron: 100g each')) {
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/knights/${parseInt(knightId)}/sell-duplicates`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: parseInt(user.user_id) })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert(`✅ ${data.message}`);
+          openInventory(); // Reload inventory to show updated items and gold
+          loadKnight(); // Reload knight stats
+        } else {
+          alert('Error: ' + (data.error || 'Failed to sell items'));
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    async function openShop() {
+      try {
+        // Fetch shop items and user gold
+        const [shopResponse, inventoryResponse] = await Promise.all([
+          fetch('/api/shop/items'),
+          fetch(`/api/inventory?knight_id=${knightId}`)
+        ]);
+        
+        const items = await shopResponse.json();
+        const inventoryData = await inventoryResponse.json();
+        
+        document.getElementById('shopGold').textContent = inventoryData.gold || 0;
+        displayShopItems(items);
+        document.getElementById('shopModal').style.display = 'block';
+      } catch (error) {
+        alert('Error loading shop');
+      }
+    }
+
+    function closeShop() {
+      document.getElementById('shopModal').style.display = 'none';
+    }
+
+    function displayShopItems(items) {
+      const container = document.getElementById('shopItems');
+      
+      container.innerHTML = items.map(item => {
+        return `
+          <div style="padding: 15px; background: #f5f7fa; border: 1px solid #e0e0e0; border-radius: 5px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <div style="flex: 1;">
+              <strong>${item.name}</strong>
+              <div style="font-size: 12px; color: #666;">${item.type}</div>
+              <div style="font-size: 11px; color: #888; font-style: italic; margin-top: 4px;">${item.description}</div>
+              <div style="font-size: 14px; color: #27ae60; font-weight: bold; margin-top: 4px;">💰 ${item.price} gold</div>
+            </div>
+            <div style="display: flex; gap: 5px; align-items: center;">
+              <input type="number" id="qty-${item.id}" value="1" min="1" max="99" style="width: 50px; padding: 5px; border: 1px solid #ddd; border-radius: 3px;">
+              <button onclick="buyItem(${item.id}, ${item.price})" style="padding: 8px 16px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer; white-space: nowrap;">Buy</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function buyItem(itemId, price) {
+      const qtyInput = document.getElementById(`qty-${itemId}`);
+      const quantity = parseInt(qtyInput.value) || 1;
+      
+      if (quantity < 1) {
+        alert('Quantity must be at least 1');
+        return;
+      }
+      
+      const totalCost = price * quantity;
+      if (!confirm(`Buy ${quantity}x for ${totalCost} gold?`)) {
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/shop/buy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: parseInt(user.user_id),
+            knight_id: parseInt(knightId),
+            item_id: parseInt(itemId),
+            quantity: quantity
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert(`✅ ${data.message}`);
+          closeShop();
+          loadKnight(); // Reload to update gold
+        } else {
+          alert('Error: ' + (data.error || 'Failed to purchase item'));
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    async function usePotion(inventoryId) {
+      try {
+        const response = await fetch(`/api/knights/${parseInt(knightId)}/use-potion`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            user_id: parseInt(user.user_id),
+            inventory_id: parseInt(inventoryId)
+          })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          alert(`✅ ${data.message}`);
+          closeInventory();
+          loadKnight(); // Reload to show updated HP
+        } else {
+          alert('Error: ' + (data.error || 'Failed to use potion'));
+        }
+      } catch (error) {
+        alert('Connection error');
+      }
+    }
+
+    // Load knight on page load
+    loadKnight();
+  </script>
+</body>
+</html>
+```
+
+    // Load knight on page load
+    loadKnight();
+  </script>
+</body>
+</html>

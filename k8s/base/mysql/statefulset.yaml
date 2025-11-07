@@ -1,0 +1,59 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mysql
+spec:
+  serviceName: mysql
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+    spec:
+      # initContainers:
+      #   - name: init-db
+      #     image: mysql:8.0
+      #     command:
+      #       - sh
+      #       - -c
+      #       - |
+      #         echo "Initializing Knight Club schema..."
+      #         mysql -h 127.0.0.1 -uroot -p"$MYSQL_ROOT_PASSWORD" < /init/initdb.sql || true
+      #     env:
+      #       - name: MYSQL_ROOT_PASSWORD
+      #         valueFrom:
+      #           secretKeyRef:
+      #             name: mysql-secrets
+      #             key: MYSQL_ROOT_PASSWORD
+      #     volumeMounts:
+      #       - name: init-sql
+      #         mountPath: /init
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          envFrom:
+            - secretRef:
+                name: mysql-secrets
+          volumeMounts:
+          - name: data
+            mountPath: /var/lib/mysql
+          - name: init-sql
+            mountPath: /docker-entrypoint-initdb.d/initdb.sql
+            subPath: initdb.sql
+      volumes:
+        - name: init-sql
+          configMap:
+            name: mysql-init-sql
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
