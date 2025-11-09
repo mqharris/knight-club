@@ -1,0 +1,7 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" fill="#1a1a1a"/>
+  <path d="M15 45 L20 10 L30 15 L35 50 Z" fill="#696969" stroke="#000" stroke-width="2"/>
+  <path d="M30 15 L45 20 L40 30 Z" fill="#4A4A4A" stroke="#000" stroke-width="2"/>
+  <rect x="26" y="45" width="8" height="8" fill="#5A5A5A" stroke="#000" stroke-width="1"/>
+  <text x="32" y="35" font-family="Arial" font-size="7" fill="#FFF" text-anchor="middle">AXE</text>
+</svg>

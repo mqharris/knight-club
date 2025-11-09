@@ -1,0 +1,6 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" fill="#1a1a1a"/>
+  <path d="M25 30 L30 20 L35 22 L32 32 Z" fill="#F5F5DC" stroke="#000" stroke-width="2"/>
+  <path d="M32 32 L35 40 L30 38 Z" fill="#DCDCDC" stroke="#000" stroke-width="1"/>
+  <text x="32" y="50" font-family="Arial" font-size="6" fill="#FFF" text-anchor="middle">WOLF</text>
+</svg>

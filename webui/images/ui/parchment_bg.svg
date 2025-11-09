@@ -1,0 +1,14 @@
+<svg width="512" height="512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="parchmentTexture" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+      <rect width="100" height="100" fill="#F5E6D3"/>
+      <path d="M10 10 Q15 12 20 10" stroke="#E6D7C3" stroke-width="0.5" fill="none" opacity="0.3"/>
+      <path d="M30 20 Q35 22 40 20" stroke="#E6D7C3" stroke-width="0.5" fill="none" opacity="0.3"/>
+      <path d="M50 30 Q55 32 60 30" stroke="#E6D7C3" stroke-width="0.5" fill="none" opacity="0.3"/>
+      <circle cx="70" cy="15" r="1" fill="#D4C4A8" opacity="0.5"/>
+      <circle cx="25" cy="45" r="1" fill="#D4C4A8" opacity="0.5"/>
+      <circle cx="85" cy="75" r="1" fill="#D4C4A8" opacity="0.5"/>
+    </pattern>
+  </defs>
+  <rect width="512" height="512" fill="url(#parchmentTexture)"/>
+</svg>

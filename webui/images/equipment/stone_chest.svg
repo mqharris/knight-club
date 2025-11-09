@@ -1,0 +1,7 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" fill="#1a1a1a"/>
+  <path d="M20 20 L44 20 L44 50 L32 45 L20 50 Z" fill="#696969" stroke="#000" stroke-width="2"/>
+  <line x1="26" y1="20" x2="26" y2="48" stroke="#4A4A4A" stroke-width="2"/>
+  <line x1="38" y1="20" x2="38" y2="48" stroke="#4A4A4A" stroke-width="2"/>
+  <text x="32" y="35" font-family="Arial" font-size="7" fill="#FFF" text-anchor="middle">CHST</text>
+</svg>

@@ -1,0 +1,7 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" fill="#1a1a1a"/>
+  <path d="M15 50 L25 10 L30 10 L40 50 Z" fill="#708090" stroke="#000" stroke-width="2"/>
+  <rect x="26" y="45" width="8" height="10" fill="#2F4F4F" stroke="#000" stroke-width="1"/>
+  <line x1="27" y1="20" x2="29" y2="20" stroke="#A9A9A9" stroke-width="1"/>
+  <text x="32" y="32" font-family="Arial" font-size="8" fill="#FFF" text-anchor="middle">IRON</text>
+</svg>

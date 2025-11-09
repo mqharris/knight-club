@@ -1,0 +1,11 @@
+<svg width="200" height="60" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="wood" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B4513;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#654321;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4A3419;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect x="5" y="5" width="190" height="50" rx="8" fill="url(#wood)" stroke="#2C1810" stroke-width="3"/>
+  <rect x="10" y="10" width="180" height="40" rx="6" fill="none" stroke="#A0826D" stroke-width="1"/>
+</svg>

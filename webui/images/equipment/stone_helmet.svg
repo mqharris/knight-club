@@ -1,0 +1,5 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" fill="#1a1a1a"/>
+  <path d="M20 35 Q32 15 44 35 L40 40 L24 40 Z" fill="#696969" stroke="#000" stroke-width="2"/>
+  <text x="32" y="32" font-family="Arial" font-size="7" fill="#FFF" text-anchor="middle">HELM</text>
+</svg>
