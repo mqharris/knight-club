@@ -333,6 +333,13 @@
           <h2 id="battleResultTitle" style="margin: 0 0 20px 0; text-align: center; color: #FFD700;">BATTLE RESULTS</h2>
           <div id="battleLog" style="background: #1a1a1a; padding: 20px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.6; max-height: 400px; overflow-y: auto; white-space: pre-wrap;"></div>
           
+          <!-- Level Up Section -->
+          <div id="battleLevelUp" style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; display: none; text-align: center; border: 2px solid #FFD700;">
+            <div style="font-size: 32px; margin-bottom: 10px;">🎉</div>
+            <h3 style="margin: 0 0 10px 0; color: #FFD700; font-size: 24px;">LEVEL UP!</h3>
+            <div id="battleLevelUpContent" style="color: white; font-size: 18px;"></div>
+          </div>
+
           <!-- Loot Section -->
           <div id="battleLoot" style="margin-top: 20px; padding: 15px; background: #1a1a1a; border-radius: 8px; display: none;">
             <h3 style="margin: 0 0 10px 0; color: #FFD700;">💰 LOOT COLLECTED 💰</h3>
@@ -692,9 +699,6 @@
           return;
         }
         
-        // Show battle results in modal
-        showBattleResults(data);
-        
         // Check for level up
         const oldLevel = knightData.level;
         const oldExp = knightData.exp || 0;
@@ -712,10 +716,14 @@
         const newLevel = Math.floor(knightData.exp / 100) + 1;
         
         // Check if leveled up
+        let leveledUp = false;
         if (newLevel > oldLevel && knightData.is_alive) {
           knightData.level = newLevel;
-          alert(`🎉 CONGRATULATIONS! 🎉\n\n${knightData.name} has reached Level ${newLevel}!`);
+          leveledUp = true;
         }
+        
+        // Show battle results in modal (with level up info)
+        showBattleResults(data, leveledUp ? newLevel : null);
         
         // If knight died, update display
         if (!data.knight_alive) {
@@ -946,7 +954,7 @@
       document.getElementById('shopModal').style.display = 'none';
     }
 
-    function showBattleResults(battleData) {
+    function showBattleResults(battleData, newLevel = null) {
       // Set monster image
       const monsterImage = getMonsterImage(battleData.monster.name);
       document.getElementById('battleMonsterImage').src = monsterImage;
@@ -961,14 +969,28 @@
         <div><img src="images/icons/agility.svg" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 3px;"> Agility: ${battleData.monster.agility}</div>
       `;
       
-      // Set battle result title
-      const resultTitle = battleData.result === 'victory' ? '⚔️ VICTORY! ⚔️' : '💀 DEFEAT 💀';
-      const resultColor = battleData.result === 'victory' ? '#27ae60' : '#e74c3c';
+      // Set battle result title (with level up if applicable)
+      let resultTitle = battleData.result === 'victory' ? '⚔️ VICTORY! ⚔️' : '💀 DEFEAT 💀';
+      if (newLevel) {
+        resultTitle = `🎉 LEVEL ${newLevel}! 🎉`;
+      }
+      const resultColor = battleData.result === 'victory' ? (newLevel ? '#FFD700' : '#27ae60') : '#e74c3c';
       document.getElementById('battleResultTitle').textContent = resultTitle;
       document.getElementById('battleResultTitle').style.color = resultColor;
       
       // Set battle log
       document.getElementById('battleLog').textContent = battleData.log.join('\n');
+      
+      // Show level up if applicable
+      if (newLevel) {
+        document.getElementById('battleLevelUp').style.display = 'block';
+        document.getElementById('battleLevelUpContent').innerHTML = `
+          <strong>${knightData.name}</strong> has reached <strong>Level ${newLevel}</strong>!<br>
+          <span style="font-size: 14px; opacity: 0.9;">All stats increased!</span>
+        `;
+      } else {
+        document.getElementById('battleLevelUp').style.display = 'none';
+      }
       
       // Show loot if victory
       if (battleData.result === 'victory' && battleData.loot) {
