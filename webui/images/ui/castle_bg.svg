@@ -1,0 +1,50 @@
+<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+  <!-- Castle silhouette -->
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#4a5568;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#2d3748;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Sky -->
+  <rect width="800" height="600" fill="url(#skyGrad)"/>
+  
+  <!-- Stars -->
+  <circle cx="100" cy="80" r="2" fill="white" opacity="0.8"/>
+  <circle cx="200" cy="120" r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="350" cy="60" r="2" fill="white" opacity="0.7"/>
+  <circle cx="500" cy="100" r="1.5" fill="white" opacity="0.8"/>
+  <circle cx="650" cy="70" r="2" fill="white" opacity="0.6"/>
+  <circle cx="720" cy="130" r="1.5" fill="white" opacity="0.7"/>
+  
+  <!-- Moon -->
+  <circle cx="650" cy="100" r="40" fill="#f4e4c1" opacity="0.9"/>
+  
+  <!-- Castle towers -->
+  <rect x="150" y="300" width="100" height="250" fill="#1a1a1a"/>
+  <polygon points="150,300 200,250 250,300" fill="#0a0a0a"/>
+  <rect x="195" y="260" width="10" height="30" fill="#0a0a0a"/>
+  <rect x="205" y="260" width="10" height="40" fill="#0a0a0a"/>
+  <rect x="215" y="260" width="10" height="30" fill="#0a0a0a"/>
+  
+  <rect x="550" y="300" width="100" height="250" fill="#1a1a1a"/>
+  <polygon points="550,300 600,250 650,300" fill="#0a0a0a"/>
+  <rect x="595" y="260" width="10" height="30" fill="#0a0a0a"/>
+  <rect x="605" y="260" width="10" height="40" fill="#0a0a0a"/>
+  <rect x="615" y="260" width="10" height="30" fill="#0a0a0a"/>
+  
+  <!-- Main castle -->
+  <rect x="250" y="320" width="300" height="230" fill="#2a2a2a"/>
+  <rect x="350" y="380" width="100" height="170" fill="#0a0a0a"/>
+  <path d="M 350 380 Q 400 340 450 380" fill="none" stroke="#0a0a0a" stroke-width="3"/>
+  
+  <!-- Windows -->
+  <rect x="280" y="360" width="30" height="40" fill="#f4e4c1" opacity="0.3"/>
+  <rect x="320" y="360" width="30" height="40" fill="#f4e4c1" opacity="0.3"/>
+  <rect x="450" y="360" width="30" height="40" fill="#f4e4c1" opacity="0.3"/>
+  <rect x="490" y="360" width="30" height="40" fill="#f4e4c1" opacity="0.3"/>
+  
+  <!-- Ground -->
+  <rect y="550" width="800" height="50" fill="#1a2332"/>
+</svg>
