@@ -206,9 +206,7 @@
         </div>
       </div>
       <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-        <button class="battle-btn" onclick="startBattle('easy')" style="flex: 1; min-width: 150px;">⚔️ EASY</button>
-        <button class="battle-btn" onclick="startBattle('medium')" style="flex: 1; min-width: 150px; background: #f39c12;">⚔️ MEDIUM</button>
-        <button class="battle-btn" onclick="startBattle('hard')" style="flex: 1; min-width: 150px; background: #e74c3c;">⚔️ HARD</button>
+        <button class="battle-btn" onclick="openDifficultySelection()" style="flex: 1; min-width: 150px; background: #e74c3c;">⚔️ BATTLE</button>
         <button class="battle-btn" style="background: #667eea; flex: 1; min-width: 150px;" onclick="openInventory()">🎒 INVENTORY</button>
         <button class="battle-btn" style="background: #27ae60; flex: 1; min-width: 150px;" onclick="openShop()">🏪 SHOP</button>
       </div>
@@ -277,6 +275,32 @@
       </div>
       <h3>Items for Sale</h3>
       <div id="shopItems"></div>
+    </div>
+  </div>
+
+  <!-- Difficulty Selection Modal -->
+  <div id="difficultyModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="max-width: 600px; margin: 100px auto; background: #2a2a2a; border-radius: 10px; padding: 40px; color: white; border: 3px solid #8B7355;">
+      <h2 style="margin: 0 0 30px 0; text-align: center; color: #FFD700; font-size: 28px;">⚔️ SELECT DIFFICULTY ⚔️</h2>
+      
+      <div style="display: flex; flex-direction: column; gap: 15px;">
+        <button onclick="startBattle('easy')" style="padding: 20px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+          ⚔️ EASY
+          <div style="font-size: 13px; margin-top: 5px; opacity: 0.9;">Recommended for beginners</div>
+        </button>
+        
+        <button onclick="startBattle('medium')" style="padding: 20px; background: #f39c12; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+          ⚔️ MEDIUM
+          <div style="font-size: 13px; margin-top: 5px; opacity: 0.9;">Balanced challenge and rewards</div>
+        </button>
+        
+        <button onclick="startBattle('hard')" style="padding: 20px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+          ⚔️ HARD
+          <div style="font-size: 13px; margin-top: 5px; opacity: 0.9;">High risk, high reward</div>
+        </button>
+      </div>
+      
+      <button onclick="closeDifficultySelection()" style="margin-top: 20px; width: 100%; padding: 15px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold;">Cancel</button>
     </div>
   </div>
 
@@ -565,6 +589,9 @@
     let pendingBattleData = null;
 
     function startBattle(difficulty = 'easy') {
+      // Close difficulty modal
+      closeDifficultySelection();
+      
       if (!knightData.is_alive) {
         alert('This knight has fallen and cannot battle.');
         return;
@@ -638,6 +665,19 @@
         alert('Connection error loading battle preview');
         console.error(error);
       }
+    }
+
+    function openDifficultySelection() {
+      // Check if knight is alive
+      if (!knightData.is_alive) {
+        alert('This knight is deceased and cannot battle.');
+        return;
+      }
+      document.getElementById('difficultyModal').style.display = 'block';
+    }
+
+    function closeDifficultySelection() {
+      document.getElementById('difficultyModal').style.display = 'none';
     }
 
     function closeBattlePreview() {
