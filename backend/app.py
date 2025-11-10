@@ -764,6 +764,34 @@ def buy_shop_item():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/battle/preview', methods=['POST'])
+def battle_preview():
+    """Get a preview of the monster that will be fought"""
+    data = request.json
+    difficulty = data.get('difficulty', 'easy')
+    
+    if difficulty not in ['easy', 'medium', 'hard']:
+        return jsonify({'error': 'Invalid difficulty'}), 400
+    
+    # Get a random monster for this difficulty and return its index
+    import random
+    from monsters import MONSTERS
+    monsters_in_tier = MONSTERS.get(difficulty, MONSTERS['easy'])
+    monster_index = random.randint(0, len(monsters_in_tier) - 1)
+    monster = monsters_in_tier[monster_index]
+    
+    return jsonify({
+        'monster': {
+            'name': monster.name,
+            'hp': monster.max_hp,
+            'attack': monster.attack,
+            'defense': monster.defense,
+            'agility': monster.agility
+        },
+        'monster_index': monster_index,
+        'difficulty': difficulty
+    }), 200
+
 @app.route('/api/battle', methods=['POST'])
 def start_battle():
     logger.error("=" * 80)
@@ -774,6 +802,7 @@ def start_battle():
     knight_id = data.get('knight_id')
     user_id = data.get('user_id')
     difficulty = data.get('difficulty', 'easy')
+    monster_index = data.get('monster_index')  # Use specific monster from preview
     
     logger.error(f"[BATTLE] Received: knight_id={knight_id}, user_id={user_id}, difficulty={difficulty}")
     sys.stderr.flush()
@@ -841,9 +870,13 @@ def start_battle():
         knight['defense_bonus'] = defense_bonus
         knight['agility_bonus'] = agility_bonus
         
-        # Get monster
-        monster = get_monster(difficulty)
-        logger.info(f"[BATTLE] Monster: {monster.name}, Difficulty: {difficulty}")
+        # Get monster (use specific index if provided from preview, otherwise random)
+        if monster_index is not None:
+            monster = get_monster(difficulty, index=monster_index)
+            logger.info(f"[BATTLE] Using monster from preview: {monster.name} (index {monster_index})")
+        else:
+            monster = get_monster(difficulty)
+            logger.info(f"[BATTLE] Random monster: {monster.name}, Difficulty: {difficulty}")
         
         # Simulate battle
         battle_result = simulate_battle(knight, monster)
