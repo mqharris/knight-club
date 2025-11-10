@@ -901,8 +901,14 @@
       
       // Get all unequipped items that match this slot from inventory
       const inventory = knightData.inventory || [];
+      console.log('All inventory items:', inventory);
+      console.log('Looking for slot:', slot);
+      console.log('Currently equipped:', knightData.equipment);
+      
       const matchingItems = inventory.filter(item => {
-        return item.slot === slot && !knightData.equipment.some(eq => eq.inventory_id === item.inventory_id);
+        const isEquipped = knightData.equipment.some(eq => eq.inventory_id === item.inventory_id);
+        console.log(`Item ${item.name}, slot: ${item.slot}, is_equipped: ${isEquipped}`);
+        return item.slot === slot && !isEquipped;
       });
       
       const container = document.getElementById('equipmentSelectionItems');
