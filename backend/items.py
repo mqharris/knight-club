@@ -186,6 +186,15 @@ ITEMS = {
         "description": "Iron leg armor (left clank right clank left clank...)",
         "rarity": "epic"
     },
+    410: {
+        "name": "Silk Cape",
+        "type": "armor",
+        "stackable": False,
+        "slot": "chest",
+        "stats": {"defense": 2, "agility": 2},
+        "description": "A lightweight cape made of spider silk (surprisingly stylish)",
+        "rarity": "epic"
+    },
     
     # Materials
     102: {
@@ -207,6 +216,13 @@ ITEMS = {
         "type": "material",
         "stackable": True,
         "description": "A massive orc tusk (worth a fortune)",
+        "rarity": "rare"
+    },
+    105: {
+        "name": "Spider Silk",
+        "type": "material",
+        "stackable": True,
+        "description": "Fine silk from a giant spider (lightweight and strong)",
         "rarity": "rare"
     },
     

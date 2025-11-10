@@ -144,6 +144,23 @@ MONSTERS = {
                 (406, 0.08),  # 8% Iron Pants (was 2%)
             ]
         ),
+        Monster(
+            name='Giant Spider',
+            hp=130,
+            attack=25,
+            defense=12,
+            agility=14,
+            xp_reward=110,
+            gold_drop=(7, 14),
+            loot_table=[
+                (105, 0.70),  # 70% Spider Silk
+                (406, 0.20),  # 20% Iron Pants
+                (410, 0.05),  # 5% Silk Cape
+                (401, 0.12),  # 12% Iron Sword
+                (403, 0.10),  # 10% Iron Shield
+                (404, 0.08),  # 8% Iron Helmet
+            ]
+        ),
     ]
 }
 
