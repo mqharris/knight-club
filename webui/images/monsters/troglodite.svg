@@ -1,0 +1,41 @@
+<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" fill="none"/>
+  <defs>
+    <style>
+      text { font-family: Arial; font-size: 24px; fill: #FFF; text-anchor: middle; }
+    </style>
+  </defs>
+  
+  <!-- Troglodite Body (reptilian) -->
+  <ellipse cx="128" cy="190" rx="40" ry="18" fill="#3d4d3d"/>
+  <rect x="95" y="135" width="66" height="55" fill="#5a6b5a" stroke="#000" stroke-width="3"/>
+  <ellipse cx="128" cy="95" rx="32" ry="35" fill="#6b7b6b" stroke="#000" stroke-width="3"/>
+  
+  <!-- Hunched posture -->
+  <path d="M95 140 Q85 130 80 145 L85 170" fill="#5a6b5a" stroke="#000" stroke-width="2"/>
+  <path d="M161 140 Q171 130 176 145 L171 170" fill="#5a6b5a" stroke="#000" stroke-width="2"/>
+  
+  <!-- Scales texture -->
+  <circle cx="110" cy="150" r="4" fill="#4a5b4a"/>
+  <circle cx="128" cy="155" r="4" fill="#4a5b4a"/>
+  <circle cx="146" cy="150" r="4" fill="#4a5b4a"/>
+  <circle cx="119" cy="165" r="4" fill="#4a5b4a"/>
+  <circle cx="137" cy="165" r="4" fill="#4a5b4a"/>
+  
+  <!-- Reptilian head -->
+  <ellipse cx="128" cy="90" rx="25" ry="28" fill="#6b7b6b" stroke="#000" stroke-width="2"/>
+  <circle cx="115" cy="88" r="6" fill="#FFD700" stroke="#000" stroke-width="2"/>
+  <circle cx="141" cy="88" r="6" fill="#FFD700" stroke="#000" stroke-width="2"/>
+  <circle cx="116" cy="88" r="2" fill="#000"/>
+  <circle cx="140" cy="88" r="2" fill="#000"/>
+  
+  <!-- Snout -->
+  <path d="M128 100 L128 110" stroke="#000" stroke-width="2"/>
+  <path d="M120 112 L136 112" stroke="#000" stroke-width="2"/>
+  
+  <!-- Claws -->
+  <path d="M80 175 L75 185 L78 175 L75 185 L80 175" fill="#3d4d3d" stroke="#000" stroke-width="1"/>
+  <path d="M176 175 L181 185 L178 175 L181 185 L176 175" fill="#3d4d3d" stroke="#000" stroke-width="1"/>
+  
+  <text x="128" y="240">TROGLODITE</text>
+</svg>

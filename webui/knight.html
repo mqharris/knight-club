@@ -280,6 +280,33 @@
     </div>
   </div>
 
+  <!-- Battle Results Modal -->
+  <div id="battleResultsModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="max-width: 900px; margin: 40px auto; background: #2a2a2a; border-radius: 10px; padding: 30px; color: white; border: 3px solid #8B7355;">
+      <div style="display: flex; gap: 30px; align-items: start;">
+        <!-- Monster Image -->
+        <div style="flex-shrink: 0;">
+          <img id="battleMonsterImage" src="" alt="Monster" style="width: 256px; height: 256px; image-rendering: pixelated; border: 2px solid #666; border-radius: 8px; background: #1a1a1a;">
+          <div id="battleMonsterStats" style="margin-top: 15px; padding: 10px; background: #1a1a1a; border-radius: 5px; font-size: 14px;"></div>
+        </div>
+        
+        <!-- Battle Log -->
+        <div style="flex: 1;">
+          <h2 id="battleResultTitle" style="margin: 0 0 20px 0; text-align: center; color: #FFD700;">BATTLE RESULTS</h2>
+          <div id="battleLog" style="background: #1a1a1a; padding: 20px; border-radius: 8px; font-family: monospace; font-size: 13px; line-height: 1.6; max-height: 400px; overflow-y: auto; white-space: pre-wrap;"></div>
+          
+          <!-- Loot Section -->
+          <div id="battleLoot" style="margin-top: 20px; padding: 15px; background: #1a1a1a; border-radius: 8px; display: none;">
+            <h3 style="margin: 0 0 10px 0; color: #FFD700;">💰 LOOT COLLECTED 💰</h3>
+            <div id="battleLootContent"></div>
+          </div>
+          
+          <button onclick="closeBattleResults()" style="margin-top: 20px; padding: 12px 30px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold;">Continue</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     // Check if user is logged in
     const user = JSON.parse(localStorage.getItem('knightclub_user') || 'null');
@@ -340,7 +367,7 @@
       document.getElementById('knightClass').textContent = knightData.class;
       document.getElementById('knightLevel').textContent = knightData.level;
       document.getElementById('knightAge').textContent = calculateAge(knightData.created_at);
-      document.getElementById('knightAvatar').src = `/images/${knightData.class}.svg`;
+      document.getElementById('knightAvatar').src = `images/classes/${knightData.class.toLowerCase()}.svg`;
       
       // Grey out and disable if dead
       if (isDead) {
@@ -551,23 +578,8 @@
           return;
         }
         
-        // Show battle log
-        const logText = data.log.join('\n');
-        let resultMessage = `BATTLE RESULTS:\n\n${logText}`;
-        
-        // Add loot information if victory
-        if (data.result === 'victory' && data.loot) {
-          resultMessage += `\n\n💰 LOOT COLLECTED 💰`;
-          resultMessage += `\n Gold: ${data.loot.gold}`;
-          if (data.loot.items.length > 0) {
-            resultMessage += `\n Items:`;
-            data.loot.items.forEach(item => {
-              resultMessage += `\n  - ${item.name}`;
-            });
-          }
-        }
-        
-        alert(resultMessage);
+        // Show battle results in modal
+        showBattleResults(data);
         
         // Check for level up
         const oldLevel = knightData.level;
@@ -655,6 +667,22 @@
 
     function closeInventory() {
       document.getElementById('inventoryModal').style.display = 'none';
+    }
+
+    // Map monster names to image filenames
+    function getMonsterImage(monsterName) {
+      const imageMap = {
+        'Level 1 Slime': 'slime.png',
+        'Giant Rat': 'rat.png',
+        'Weak Goblin': 'weak_goblin.png',
+        'Forest Wolf': 'wolf.png',
+        'Goblin Warrior': 'goblin_warrior.svg',
+        'Troglodite': 'troglodite.svg',
+        'Orc': 'orc.svg'
+      };
+      
+      const filename = imageMap[monsterName];
+      return filename ? `images/monsters/${filename}` : '';
     }
 
     // Map item names to image filenames
@@ -802,6 +830,56 @@
 
     function closeShop() {
       document.getElementById('shopModal').style.display = 'none';
+    }
+
+    function showBattleResults(battleData) {
+      // Set monster image
+      const monsterImage = getMonsterImage(battleData.monster.name);
+      document.getElementById('battleMonsterImage').src = monsterImage;
+      document.getElementById('battleMonsterImage').alt = battleData.monster.name;
+      
+      // Set monster stats
+      document.getElementById('battleMonsterStats').innerHTML = `
+        <div style="font-weight: bold; margin-bottom: 8px; color: #FFD700;">${battleData.monster.name}</div>
+        <div>HP: ${battleData.monster.hp}</div>
+        <div><img src="images/icons/attack.svg" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 3px;"> Attack: ${battleData.monster.attack}</div>
+        <div><img src="images/icons/defense.svg" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 3px;"> Defense: ${battleData.monster.defense}</div>
+        <div><img src="images/icons/agility.svg" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 3px;"> Agility: ${battleData.monster.agility}</div>
+      `;
+      
+      // Set battle result title
+      const resultTitle = battleData.result === 'victory' ? '⚔️ VICTORY! ⚔️' : '💀 DEFEAT 💀';
+      const resultColor = battleData.result === 'victory' ? '#27ae60' : '#e74c3c';
+      document.getElementById('battleResultTitle').textContent = resultTitle;
+      document.getElementById('battleResultTitle').style.color = resultColor;
+      
+      // Set battle log
+      document.getElementById('battleLog').textContent = battleData.log.join('\n');
+      
+      // Show loot if victory
+      if (battleData.result === 'victory' && battleData.loot) {
+        document.getElementById('battleLoot').style.display = 'block';
+        let lootHTML = `<div style="margin-bottom: 10px;"><img src="images/icons/gold.svg" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 5px;"> <strong>Gold:</strong> ${battleData.loot.gold}</div>`;
+        
+        if (battleData.loot.items.length > 0) {
+          lootHTML += `<div><strong>Items:</strong></div><ul style="margin: 5px 0; padding-left: 20px;">`;
+          battleData.loot.items.forEach(item => {
+            lootHTML += `<li>${item.name}</li>`;
+          });
+          lootHTML += `</ul>`;
+        }
+        
+        document.getElementById('battleLootContent').innerHTML = lootHTML;
+      } else {
+        document.getElementById('battleLoot').style.display = 'none';
+      }
+      
+      // Show modal
+      document.getElementById('battleResultsModal').style.display = 'block';
+    }
+
+    function closeBattleResults() {
+      document.getElementById('battleResultsModal').style.display = 'none';
     }
 
     function displayShopItems(items) {

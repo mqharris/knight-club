@@ -187,8 +187,9 @@
              onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
              onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
              onclick="window.location.href='/knight.html?id=${knight.id}'">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+            <img src="images/classes/${knight.class.toLowerCase()}.svg" alt="${knight.class}" style="width: 80px; height: 80px; flex-shrink: 0;">
+            <div style="flex: 1;">
               <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
                 <h3 style="margin: 0; color: #333;">${knight.name}</h3>
                 ${statusBadge}

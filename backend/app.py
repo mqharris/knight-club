@@ -927,7 +927,14 @@ def start_battle():
             'xp_gained': battle_result['xp_gained'],
             'exp': new_exp,
             'level': new_level,
-            'loot': battle_result.get('loot', {'gold': 0, 'items': []})
+            'loot': battle_result.get('loot', {'gold': 0, 'items': []}),
+            'monster': {
+                'name': monster.name,
+                'hp': monster.max_hp,
+                'attack': monster.attack,
+                'defense': monster.defense,
+                'agility': monster.agility
+            }
         }), 200
         
     except TypeError as e:
