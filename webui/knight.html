@@ -119,6 +119,13 @@
       padding: 15px;
       border-radius: 5px;
       border: 2px solid #ddd;
+      min-height: 120px;
+      transition: all 0.2s;
+    }
+    .equipment-slot:hover {
+      border-color: #667eea;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
     .equipment-slot.empty {
       opacity: 0.6;
@@ -278,6 +285,17 @@
     </div>
   </div>
 
+  <!-- Equipment Selection Modal -->
+  <div id="equipmentSelectionModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); z-index: 1000; padding: 20px; overflow-y: auto;">
+    <div style="max-width: 800px; margin: 40px auto; background: white; border-radius: 10px; padding: 30px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2 style="margin: 0;">⚔️ Equip <span id="equipSlotTitle"></span></h2>
+        <button onclick="closeEquipmentSelection()" style="padding: 8px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Close</button>
+      </div>
+      <div id="equipmentSelectionItems"></div>
+    </div>
+  </div>
+
   <!-- Difficulty Selection Modal -->
   <div id="difficultyModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 1000; padding: 20px; overflow-y: auto;">
     <div style="max-width: 600px; margin: 100px auto; background: #2a2a2a; border-radius: 10px; padding: 40px; color: white; border: 3px solid #8B7355;">
@@ -286,17 +304,17 @@
       <div style="display: flex; flex-direction: column; gap: 15px;">
         <button onclick="startBattle('easy')" style="padding: 20px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
           ⚔️ EASY
-          <div style="font-size: 13px; margin-top: 5px; opacity: 0.9;">Recommended for beginners</div>
+          <div style="font-size: 13px; margin-top: 5px; opacity: 0.9;">placeholder text</div>
         </button>
         
         <button onclick="startBattle('medium')" style="padding: 20px; background: #f39c12; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
           ⚔️ MEDIUM
-          <div style="font-size: 13px; margin-top: 5px; opacity: 0.9;">Balanced challenge and rewards</div>
+          <div style="font-size: 13px; margin-top: 5px; opacity: 0.9;">placeholder text</div>
         </button>
         
         <button onclick="startBattle('hard')" style="padding: 20px; background: #e74c3c; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
           ⚔️ HARD
-          <div style="font-size: 13px; margin-top: 5px; opacity: 0.9;">High risk, high reward</div>
+          <div style="font-size: 13px; margin-top: 5px; opacity: 0.9;">placeholder text</div>
         </button>
       </div>
       
@@ -491,19 +509,22 @@
           const statsText = Object.entries(equippedItem.stats || {})
             .map(([key, val]) => `${key}: +${val}`)
             .join(', ');
+          const itemIcon = getItemIcon(equippedItem.name);
           
           return `
-            <div class="equipment-slot filled" onclick="unequipItem(${equippedItem.inventory_id})" style="cursor: pointer;">
-              <div class="slot-name">${slotName}</div>
-              <div class="slot-item" style="color: #667eea; font-weight: 600;">${equippedItem.name}</div>
-              ${statsText ? `<div style="font-size: 11px; color: #27ae60;">${statsText}</div>` : ''}
+            <div class="equipment-slot filled" onclick="openEquipmentSelection('${slot}')" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+              <img src="${itemIcon}" alt="${equippedItem.name}" style="width: 48px; height: 48px; image-rendering: pixelated; margin-bottom: 8px;">
+              <div class="slot-name" style="font-size: 11px;">${slotName}</div>
+              <div class="slot-item" style="color: #667eea; font-weight: 600; font-size: 12px;">${equippedItem.name}</div>
+              ${statsText ? `<div style="font-size: 10px; color: #27ae60; margin-top: 3px;">${statsText}</div>` : ''}
             </div>
           `;
         } else {
           return `
-            <div class="equipment-slot empty">
-              <div class="slot-name">${slotName}</div>
-              <div class="slot-item">Empty</div>
+            <div class="equipment-slot empty" onclick="openEquipmentSelection('${slot}')" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+              <div style="width: 48px; height: 48px; background: #ddd; border-radius: 5px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; opacity: 0.3;">+</div>
+              <div class="slot-name" style="font-size: 11px;">${slotName}</div>
+              <div class="slot-item" style="font-size: 12px;">Empty</div>
             </div>
           `;
         }
@@ -608,9 +629,9 @@
 
     async function showBattlePreview(difficulty) {
       const difficultyDescriptions = {
-        'easy': 'Low-level monsters suitable for beginners. Good for training and gathering basic materials.',
-        'medium': 'Moderate challenge with better rewards. Recommended for knights level 5+.',
-        'hard': 'Dangerous enemies with high stats. Only for well-equipped, high-level knights.'
+        'easy': 'placeholder text',
+        'medium': 'placeholder text',
+        'hard': 'placeholder text'
       };
 
       try {
@@ -829,6 +850,95 @@
 
     function closeInventory() {
       document.getElementById('inventoryModal').style.display = 'none';
+    }
+
+    let selectedEquipmentSlot = null;
+
+    function openEquipmentSelection(slot) {
+      selectedEquipmentSlot = slot;
+      const slotTitle = slot === 'ring' ? 'Ring' : slot.charAt(0).toUpperCase() + slot.slice(1);
+      document.getElementById('equipSlotTitle').textContent = slotTitle;
+      
+      // Get all unequipped items that match this slot from inventory
+      const inventory = knightData.inventory || [];
+      const matchingItems = inventory.filter(item => {
+        return item.slot === slot && !knightData.equipment.some(eq => eq.inventory_id === item.inventory_id);
+      });
+      
+      const container = document.getElementById('equipmentSelectionItems');
+      
+      if (matchingItems.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No items available for this slot. Visit the shop to purchase equipment!</p>';
+      } else {
+        container.innerHTML = `
+          <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
+            ${matchingItems.map(item => {
+              const statsText = Object.entries(item.stats || {})
+                .map(([key, val]) => `<div style="font-size: 13px; color: #27ae60;"><strong>${key}:</strong> +${val}</div>`)
+                .join('');
+              const itemIcon = getItemIcon(item.name);
+              
+              return `
+                <div style="background: #f5f7fa; padding: 15px; border-radius: 8px; cursor: pointer; border: 2px solid #ddd; transition: all 0.2s; text-align: center;" 
+                     onclick="equipItemFromSelection(${item.inventory_id})"
+                     onmouseover="this.style.borderColor='#667eea'; this.style.transform='translateY(-2px)'"
+                     onmouseout="this.style.borderColor='#ddd'; this.style.transform='translateY(0)'">
+                  <img src="${itemIcon}" alt="${item.name}" style="width: 64px; height: 64px; image-rendering: pixelated; margin-bottom: 10px;">
+                  <div style="font-weight: 600; color: #333; margin-bottom: 8px;">${item.name}</div>
+                  ${statsText}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        `;
+      }
+      
+      // Show option to unequip if something is currently equipped
+      const currentlyEquipped = knightData.equipment.find(eq => eq.slot === slot);
+      if (currentlyEquipped) {
+        container.innerHTML = `
+          <div style="margin-bottom: 20px; padding: 15px; background: #fff3cd; border-radius: 5px; border: 2px solid #ffc107;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <strong>Currently Equipped:</strong> ${currentlyEquipped.name}
+              </div>
+              <button onclick="unequipItem(${currentlyEquipped.inventory_id})" style="padding: 8px 15px; background: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold;">Unequip</button>
+            </div>
+          </div>
+        ` + container.innerHTML;
+      }
+      
+      document.getElementById('equipmentSelectionModal').style.display = 'block';
+    }
+
+    function closeEquipmentSelection() {
+      document.getElementById('equipmentSelectionModal').style.display = 'none';
+      selectedEquipmentSlot = null;
+    }
+
+    async function equipItemFromSelection(inventoryId) {
+      try {
+        const response = await fetch('/api/equip', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            knight_id: knightId,
+            inventory_id: inventoryId
+          })
+        });
+        const data = await response.json();
+        
+        if (response.ok) {
+          knightData = data.knight;
+          displayEquipment();
+          displayStats();
+          closeEquipmentSelection();
+        } else {
+          alert(data.error || 'Failed to equip item');
+        }
+      } catch (error) {
+        alert('Connection error. Please try again.');
+      }
     }
 
     // Map monster names to image filenames
