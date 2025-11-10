@@ -99,6 +99,13 @@
 
     <div id="knightsList"></div>
 
+    <div id="deceasedSection" style="margin-top: 40px; padding: 20px; background: #f5f7fa; border-radius: 8px; border: 2px solid #e0e0e0; display: none;">
+      <h3 style="margin: 0 0 20px 0; color: #666; display: flex; align-items: center; gap: 10px;">
+        ⚰️ Fallen Knights
+      </h3>
+      <div id="deceasedList"></div>
+    </div>
+
     <button id="createKnightBtn" onclick="showCreateForm()" style="margin-top: 20px; padding: 12px 30px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 16px;">
       Create New Knight
     </button>
@@ -170,40 +177,69 @@
     }
 
     function displayKnights() {
-      const container = document.getElementById('knightsList');
+      const livingKnights = knights.filter(k => k.is_alive);
+      const deceasedKnights = knights.filter(k => !k.is_alive);
       
-      if (knights.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No knights yet. Create your first knight!</p>';
-        return;
-      }
-
-      container.innerHTML = knights.map(knight => {
-        const isDead = !knight.is_alive;
-        const greyStyle = isDead ? 'opacity: 0.5; filter: grayscale(100%);' : '';
-        const statusBadge = isDead ? '<span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">DECEASED</span>' : '';
-        
-        return `
-        <div style="background: #f5f7fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s; ${greyStyle}" 
-             onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
-             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
-             onclick="window.location.href='/knight.html?id=${knight.id}'">
-          <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
-            <img src="images/classes/${knight.class.toLowerCase()}.svg" alt="${knight.class}" style="width: 80px; height: 80px; flex-shrink: 0;">
-            <div style="flex: 1;">
-              <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-                <h3 style="margin: 0; color: #333;">${knight.name}</h3>
-                ${statusBadge}
+      const container = document.getElementById('knightsList');
+      const deceasedContainer = document.getElementById('deceasedList');
+      const deceasedSection = document.getElementById('deceasedSection');
+      
+      // Display living knights
+      if (livingKnights.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No living knights. Create your first knight!</p>';
+      } else {
+        container.innerHTML = livingKnights.map(knight => {
+          return `
+          <div style="background: #f5f7fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s;" 
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+               onclick="window.location.href='/knight.html?id=${knight.id}'">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+              <img src="images/classes/${knight.class.toLowerCase()}.svg" alt="${knight.class}" style="width: 80px; height: 80px; flex-shrink: 0;">
+              <div style="flex: 1;">
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                  <h3 style="margin: 0; color: #333;">${knight.name}</h3>
+                </div>
+                <p style="margin: 5px 0; color: #666;"><strong>Class:</strong> ${knight.class}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Level:</strong> ${knight.level}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Age:</strong> ${calculateAge(knight.created_at)}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>HP:</strong> ${knight.current_hp} / ${knight.max_hp}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>XP:</strong> ${knight.exp || 0}</p>
               </div>
-              <p style="margin: 5px 0; color: #666;"><strong>Class:</strong> ${knight.class}</p>
-              <p style="margin: 5px 0; color: #666;"><strong>Level:</strong> ${knight.level}</p>
-              <p style="margin: 5px 0; color: #666;"><strong>Age:</strong> ${calculateAge(knight.created_at)}</p>
-              ${isDead ? '<p style="margin: 5px 0; color: #e74c3c;"><strong>HP:</strong> 0 / ' + knight.max_hp + '</p>' : '<p style="margin: 5px 0; color: #666;"><strong>HP:</strong> ' + knight.current_hp + ' / ' + knight.max_hp + '</p>'}
-              ${isDead ? '' : '<p style="margin: 5px 0; color: #666;"><strong>XP:</strong> ' + (knight.exp || 0) + '</p>'}
+              <div style="color: #667eea; font-size: 24px;">→</div>
             </div>
-            <div style="color: #667eea; font-size: 24px;">→</div>
           </div>
-        </div>
-      `}).join('');
+        `}).join('');
+      }
+      
+      // Display deceased knights
+      if (deceasedKnights.length > 0) {
+        deceasedSection.style.display = 'block';
+        deceasedContainer.innerHTML = deceasedKnights.map(knight => {
+          return `
+          <div style="background: white; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s; opacity: 0.7; filter: grayscale(100%);" 
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'; this.style.opacity='0.85'"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.opacity='0.7'"
+               onclick="window.location.href='/knight.html?id=${knight.id}'">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+              <img src="images/classes/${knight.class.toLowerCase()}.svg" alt="${knight.class}" style="width: 80px; height: 80px; flex-shrink: 0;">
+              <div style="flex: 1;">
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                  <h3 style="margin: 0; color: #666;">${knight.name}</h3>
+                  <span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">DECEASED</span>
+                </div>
+                <p style="margin: 5px 0; color: #888;"><strong>Class:</strong> ${knight.class}</p>
+                <p style="margin: 5px 0; color: #888;"><strong>Level:</strong> ${knight.level}</p>
+                <p style="margin: 5px 0; color: #888;"><strong>Age:</strong> ${calculateAge(knight.created_at)}</p>
+                <p style="margin: 5px 0; color: #e74c3c;"><strong>HP:</strong> 0 / ${knight.max_hp}</p>
+              </div>
+              <div style="color: #999; font-size: 24px;">→</div>
+            </div>
+          </div>
+        `}).join('');
+      } else {
+        deceasedSection.style.display = 'none';
+      }
     }
 
     function calculateAge(created_at) {
