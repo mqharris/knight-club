@@ -542,8 +542,9 @@
       });
       
       container.innerHTML = equipmentSlots.map((slot, index) => {
-        const slotName = slot === 'ring' ? `Ring ${index === 7 ? '1' : '2'}` : slot;
+        const slotName = slot === 'ring' ? `Ring ${index === 9 ? '1' : '2'}` : slot.charAt(0).toUpperCase() + slot.slice(1);
         const equippedItem = equippedBySlot[slot];
+        const slotId = `slot-${slot}-${index}`;
         
         if (equippedItem) {
           const statsText = Object.entries(equippedItem.stats || {})
@@ -552,7 +553,7 @@
           const itemIcon = getItemIcon(equippedItem.name);
           
           return `
-            <div class="equipment-slot filled" onclick="openEquipmentSelection('${slot}')" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div class="equipment-slot filled" id="${slotId}" data-slot="${slot}" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
               <img src="${itemIcon}" alt="${equippedItem.name}" style="width: 48px; height: 48px; image-rendering: pixelated; margin-bottom: 8px;">
               <div class="slot-name" style="font-size: 11px;">${slotName}</div>
               <div class="slot-item" style="color: #667eea; font-weight: 600; font-size: 12px;">${equippedItem.name}</div>
@@ -561,7 +562,7 @@
           `;
         } else {
           return `
-            <div class="equipment-slot empty" onclick="openEquipmentSelection('${slot}')" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+            <div class="equipment-slot empty" id="${slotId}" data-slot="${slot}" style="cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
               <div style="width: 48px; height: 48px; background: #ddd; border-radius: 5px; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; opacity: 0.3;">+</div>
               <div class="slot-name" style="font-size: 11px;">${slotName}</div>
               <div class="slot-item" style="font-size: 12px;">Empty</div>
@@ -569,6 +570,15 @@
           `;
         }
       }).join('');
+      
+      // Add click event listeners to all equipment slots
+      equipmentSlots.forEach((slot, index) => {
+        const slotId = `slot-${slot}-${index}`;
+        const element = document.getElementById(slotId);
+        if (element) {
+          element.addEventListener('click', () => openEquipmentSelection(slot));
+        }
+      });
     }
 
     function displayStats() {
@@ -914,7 +924,7 @@
       const container = document.getElementById('equipmentSelectionItems');
       
       if (matchingItems.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No items available for this slot. Visit the shop to purchase equipment!</p>';
+        container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No items available for this slot.</p>';
       } else {
         container.innerHTML = `
           <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;">
