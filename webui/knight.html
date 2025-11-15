@@ -976,11 +976,10 @@
 
     async function equipItemFromSelection(inventoryId) {
       try {
-        const response = await fetch('/api/equip', {
+        const response = await fetch(`/api/knights/${knightId}/equip`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            knight_id: knightId,
             inventory_id: inventoryId
           })
         });
