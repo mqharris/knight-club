@@ -5,26 +5,48 @@
   <title>Knight Club - Dashboard</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
       min-height: 100vh;
       margin: 0;
       padding: 20px;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('images/ui/castle_bg.svg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.15;
+      z-index: 0;
+      pointer-events: none;
     }
     .navbar {
-      background: white;
+      background: rgba(42, 42, 42, 0.95);
       padding: 15px 30px;
       border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.3);
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 30px;
+      border: 2px solid #8B7355;
+      position: relative;
+      z-index: 1;
     }
     .navbar h1 {
       margin: 0;
-      color: #333;
+      color: #FFD700;
       font-size: 24px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
     .navbar .user-info {
       display: flex;
@@ -32,33 +54,43 @@
       align-items: center;
     }
     .navbar .username {
-      color: #667eea;
+      color: #FFD700;
       font-weight: 600;
     }
     .navbar button {
       padding: 8px 20px;
-      background: #667eea;
+      background: linear-gradient(135deg, #8B7355 0%, #A0826D 100%);
       color: white;
-      border: none;
+      border: 2px solid #5C4833;
       border-radius: 5px;
       cursor: pointer;
       font-weight: 600;
+      transition: all 0.3s;
     }
     .navbar button:hover {
-      background: #5568d3;
+      background: linear-gradient(135deg, #A0826D 0%, #8B7355 100%);
+      transform: translateY(-2px);
     }
     .content {
-      background: white;
+      background: rgba(255, 255, 255, 0.95);
       padding: 40px;
       border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       max-width: 800px;
       margin: 0 auto;
+      border: 3px solid #8B7355;
+      position: relative;
+      z-index: 1;
     }
     .welcome {
       text-align: center;
-      color: #333;
+      color: #2d3748;
       margin-bottom: 30px;
+    }
+    .welcome h2 {
+      color: #8B7355;
+      font-size: 28px;
+      margin-bottom: 10px;
     }
     .stats {
       display: grid;
@@ -85,7 +117,10 @@
 </head>
 <body>
   <div class="navbar">
-    <h1>🛡️ KNIGHT CLUB</h1>
+    <h1>
+      <img src="images/ui/shield_emblem.svg" alt="Shield" style="width: 30px; height: 30px;">
+      KNIGHT CLUB
+    </h1>
     <div class="user-info">
       <span class="username" id="username"></span>
       <button onclick="logout()">Logout</button>
@@ -99,9 +134,14 @@
 
     <div id="knightsList"></div>
 
-    <button id="createKnightBtn" onclick="showCreateForm()" style="margin-top: 20px; padding: 12px 30px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 16px;">
-      Create New Knight
-    </button>
+    <div style="display: flex; gap: 15px; margin-top: 20px; flex-wrap: wrap;">
+      <button id="createKnightBtn" onclick="showCreateForm()" style="flex: 1; min-width: 200px; padding: 12px 30px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 16px;">
+        Create New Knight
+      </button>
+      <a href="graveyard.html" id="graveyardBtn" style="flex: 1; min-width: 200px; padding: 12px 30px; background: #555; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; font-size: 16px; text-decoration: none; text-align: center; display: none;">
+        ⚰️ View Graveyard (<span id="deceasedCount">0</span>)
+      </a>
+    </div>
 
     <div id="createFormContainer" style="display: none; margin-top: 30px; padding: 20px; background: #f5f7fa; border-radius: 8px;">
       <h3>Create a New Knight</h3>
@@ -170,39 +210,48 @@
     }
 
     function displayKnights() {
+      const livingKnights = knights.filter(k => k.is_alive);
+      const deceasedKnights = knights.filter(k => !k.is_alive);
+      
       const container = document.getElementById('knightsList');
       
-      if (knights.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No knights yet. Create your first knight!</p>';
-        return;
-      }
-
-      container.innerHTML = knights.map(knight => {
-        const isDead = !knight.is_alive;
-        const greyStyle = isDead ? 'opacity: 0.5; filter: grayscale(100%);' : '';
-        const statusBadge = isDead ? '<span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">DECEASED</span>' : '';
-        
-        return `
-        <div style="background: #f5f7fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s; ${greyStyle}" 
-             onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
-             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
-             onclick="window.location.href='/knight.html?id=${knight.id}'">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-              <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
-                <h3 style="margin: 0; color: #333;">${knight.name}</h3>
-                ${statusBadge}
+      // Display living knights
+      if (livingKnights.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No living knights. Create your first knight!</p>';
+      } else {
+        container.innerHTML = livingKnights.map(knight => {
+          return `
+          <div style="background: #f5f7fa; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s;" 
+               onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)'"
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'"
+               onclick="window.location.href='/knight.html?id=${knight.id}'">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+              <img src="images/classes/${knight.class.toLowerCase()}.svg" alt="${knight.class}" style="width: 80px; height: 80px; flex-shrink: 0;">
+              <div style="flex: 1;">
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                  <h3 style="margin: 0; color: #333;">${knight.name}</h3>
+                </div>
+                <p style="margin: 5px 0; color: #666;"><strong>Class:</strong> ${knight.class}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Level:</strong> ${knight.level}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>Age:</strong> ${calculateAge(knight.created_at)}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>HP:</strong> ${knight.current_hp} / ${knight.max_hp}</p>
+                <p style="margin: 5px 0; color: #666;"><strong>XP:</strong> ${knight.exp || 0}</p>
               </div>
-              <p style="margin: 5px 0; color: #666;"><strong>Class:</strong> ${knight.class}</p>
-              <p style="margin: 5px 0; color: #666;"><strong>Level:</strong> ${knight.level}</p>
-              <p style="margin: 5px 0; color: #666;"><strong>Age:</strong> ${calculateAge(knight.created_at)}</p>
-              ${isDead ? '<p style="margin: 5px 0; color: #e74c3c;"><strong>HP:</strong> 0 / ' + knight.max_hp + '</p>' : '<p style="margin: 5px 0; color: #666;"><strong>HP:</strong> ' + knight.current_hp + ' / ' + knight.max_hp + '</p>'}
-              ${isDead ? '' : '<p style="margin: 5px 0; color: #666;"><strong>XP:</strong> ' + (knight.exp || 0) + '</p>'}
+              <div style="color: #667eea; font-size: 24px;">→</div>
             </div>
-            <div style="color: #667eea; font-size: 24px;">→</div>
           </div>
-        </div>
-      `}).join('');
+        `}).join('');
+      }
+      
+      // Update graveyard button
+      const graveyardBtn = document.getElementById('graveyardBtn');
+      const deceasedCount = document.getElementById('deceasedCount');
+      if (deceasedKnights.length > 0) {
+        graveyardBtn.style.display = 'block';
+        deceasedCount.textContent = deceasedKnights.length;
+      } else {
+        graveyardBtn.style.display = 'none';
+      }
     }
 
     function calculateAge(created_at) {

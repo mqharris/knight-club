@@ -1,0 +1,6 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" fill="#1a1a1a"/>
+  <path d="M35 10 Q45 32 35 54" fill="none" stroke="#8B4513" stroke-width="3"/>
+  <line x1="35" y1="15" x2="35" y2="49" stroke="#DDD" stroke-width="1"/>
+  <text x="32" y="35" font-family="Arial" font-size="8" fill="#FFF" text-anchor="middle">BOW</text>
+</svg>

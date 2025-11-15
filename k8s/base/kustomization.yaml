@@ -19,13 +19,5 @@ configMapGenerator:
     files:
       - mysql/initdb.sql
 
-# secretGenerator:
-#   - name: mysql-secrets
-#     behavior: create
-#     literals:
-#       - MYSQL_ROOT_PASSWORD=password
-#       - MYSQL_DATABASE=knightclub
-#       - MYSQL_USER=app
-#       - MYSQL_PASSWORD=password
 generatorOptions:
   disableNameSuffixHash: true

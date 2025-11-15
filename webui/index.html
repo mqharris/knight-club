@@ -5,25 +5,56 @@
   <title>Knight Club - Login</title>
   <style>
     body {
-      font-family: sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       margin: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('images/ui/castle_bg.svg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.3;
+      z-index: 0;
     }
     .container {
-      background: white;
+      background: rgba(42, 42, 42, 0.95);
       padding: 40px;
       border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
       width: 350px;
+      border: 3px solid #8B7355;
+      position: relative;
+      z-index: 1;
     }
     h1 {
       text-align: center;
-      color: #333;
+      color: #FFD700;
+      margin-bottom: 10px;
+      font-size: 32px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #A0826D;
       margin-bottom: 30px;
+      font-style: italic;
+      font-size: 14px;
     }
     .form-group {
       margin-bottom: 20px;
@@ -31,65 +62,88 @@
     label {
       display: block;
       margin-bottom: 5px;
-      color: #555;
+      color: #D4C5B9;
       font-weight: 600;
     }
     input {
       width: 100%;
       padding: 10px;
-      border: 2px solid #ddd;
+      border: 2px solid #8B7355;
       border-radius: 5px;
       font-size: 14px;
       box-sizing: border-box;
+      background: rgba(255, 255, 255, 0.9);
     }
     input:focus {
       outline: none;
-      border-color: #667eea;
+      border-color: #FFD700;
+      box-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
     }
     button {
       width: 100%;
       padding: 12px;
-      background: #667eea;
+      background: linear-gradient(135deg, #8B7355 0%, #A0826D 100%);
       color: white;
-      border: none;
+      border: 2px solid #5C4833;
       border-radius: 5px;
       font-size: 16px;
       font-weight: 600;
       cursor: pointer;
       margin-top: 10px;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+      transition: all 0.3s;
     }
     button:hover {
-      background: #5568d3;
+      background: linear-gradient(135deg, #A0826D 0%, #8B7355 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     }
     .switch {
       text-align: center;
       margin-top: 20px;
-      color: #666;
+      color: #A0826D;
     }
     .switch a {
-      color: #667eea;
+      color: #FFD700;
       text-decoration: none;
       font-weight: 600;
+      transition: all 0.3s;
+    }
+    .switch a:hover {
+      color: #FFA500;
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
     }
     .message {
       padding: 10px;
       border-radius: 5px;
       margin-bottom: 20px;
       text-align: center;
+      border: 2px solid;
     }
     .error {
-      background: #fee;
-      color: #c33;
+      background: rgba(200, 50, 50, 0.2);
+      color: #ff6b6b;
+      border-color: #ff6b6b;
     }
     .success {
-      background: #efe;
-      color: #3c3;
+      background: rgba(50, 200, 50, 0.2);
+      color: #51cf66;
+      border-color: #51cf66;
+    }
+    .shield-icon {
+      width: 40px;
+      height: 40px;
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>KNIGHT CLUB <span style="font-size: 14px; color: #999; font-weight: normal; display: block; margin-top: 5px;">v0.2.0</span></h1>
+    <h1>
+      <img src="images/ui/shield_emblem.svg" alt="Shield" class="shield-icon">
+      KNIGHT CLUB
+      <img src="images/ui/shield_emblem.svg" alt="Shield" class="shield-icon">
+    </h1>
+    <div class="subtitle">Enter the realm of valor and glory</div>
     <div id="message"></div>
     <form id="authForm">
       <div class="form-group">

@@ -1,0 +1,207 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Knight Club - Graveyard</title>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('images/ui/castle_bg.svg');
+      background-size: cover;
+      background-position: center;
+      opacity: 0.1;
+      z-index: 0;
+      pointer-events: none;
+      filter: grayscale(100%);
+    }
+    .navbar {
+      background: rgba(20, 20, 20, 0.95);
+      padding: 15px 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      border: 2px solid #555;
+      position: relative;
+      z-index: 1;
+    }
+    .navbar h1 {
+      margin: 0;
+      color: #999;
+      font-size: 24px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    }
+    .navbar .user-info {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .navbar .username {
+      color: #999;
+      font-weight: 600;
+    }
+    .navbar button {
+      padding: 8px 20px;
+      background: linear-gradient(135deg, #555 0%, #333 100%);
+      color: white;
+      border: 2px solid #222;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    .navbar button:hover {
+      background: linear-gradient(135deg, #666 0%, #444 100%);
+      transform: translateY(-2px);
+    }
+    .back-btn {
+      padding: 8px 20px;
+      background: linear-gradient(135deg, #555 0%, #333 100%);
+      color: white;
+      border: 2px solid #222;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      transition: all 0.3s;
+    }
+    .back-btn:hover {
+      background: linear-gradient(135deg, #666 0%, #444 100%);
+      transform: translateY(-2px);
+    }
+    .content {
+      background: rgba(30, 30, 30, 0.95);
+      padding: 40px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      max-width: 800px;
+      margin: 0 auto;
+      border: 2px solid #555;
+      position: relative;
+      z-index: 1;
+    }
+    .welcome {
+      text-align: center;
+      color: #999;
+      margin-bottom: 30px;
+    }
+    .welcome h2 {
+      color: #888;
+      font-size: 28px;
+    }
+    .welcome p {
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="navbar">
+    <h1>⚰️ GRAVEYARD</h1>
+    <div class="user-info">
+      <a href="dashboard.html" class="back-btn">← Back to Dashboard</a>
+      <span class="username" id="username"></span>
+      <button onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="welcome">
+      <h2>Fallen Knights</h2>
+      <p style="color: #999; font-style: italic;">In memory of those who fell in battle</p>
+    </div>
+
+    <div id="deceasedList"></div>
+  </div>
+
+  <script>
+    // Check if user is logged in
+    const user = JSON.parse(localStorage.getItem('knightclub_user') || 'null');
+    if (!user) {
+      window.location.href = '/';
+    }
+
+    // Display username
+    document.getElementById('username').textContent = user.username;
+
+    function logout() {
+      localStorage.removeItem('knightclub_user');
+      window.location.href = '/';
+    }
+
+    async function loadDeceasedKnights() {
+      try {
+        const response = await fetch(`/api/knights?user_id=${user.user_id}`);
+        const data = await response.json();
+        
+        if (response.ok) {
+          const deceasedKnights = (data.knights || []).filter(k => !k.is_alive);
+          displayDeceasedKnights(deceasedKnights);
+        }
+      } catch (error) {
+        document.getElementById('deceasedList').innerHTML = '<p style="text-align: center; color: #999;">Error loading deceased knights</p>';
+      }
+    }
+
+    function displayDeceasedKnights(knights) {
+      const container = document.getElementById('deceasedList');
+      
+      if (knights.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">No fallen knights yet. Your warriors are still fighting strong!</p>';
+        return;
+      }
+
+      container.innerHTML = knights.map(knight => {
+        return `
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 15px; cursor: pointer; transition: transform 0.2s; opacity: 0.7; filter: grayscale(100%); border: 2px solid #ddd;" 
+             onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)'; this.style.opacity='0.85'"
+             onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'; this.style.opacity='0.7'"
+             onclick="window.location.href='/knight.html?id=${knight.id}'">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 20px;">
+            <img src="images/classes/${knight.class.toLowerCase()}.svg" alt="${knight.class}" style="width: 80px; height: 80px; flex-shrink: 0;">
+            <div style="flex: 1;">
+              <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
+                <h3 style="margin: 0; color: #666;">${knight.name}</h3>
+                <span style="background: #e74c3c; color: white; padding: 3px 8px; border-radius: 3px; font-size: 12px; font-weight: bold;">DECEASED</span>
+              </div>
+              <p style="margin: 5px 0; color: #888;"><strong>Class:</strong> ${knight.class}</p>
+              <p style="margin: 5px 0; color: #888;"><strong>Final Level:</strong> ${knight.level}</p>
+              <p style="margin: 5px 0; color: #888;"><strong>Lifetime:</strong> ${calculateAge(knight.created_at)}</p>
+              <p style="margin: 5px 0; color: #e74c3c;"><strong>HP:</strong> 0 / ${knight.max_hp}</p>
+            </div>
+            <div style="color: #999; font-size: 24px;">→</div>
+          </div>
+        </div>
+      `}).join('');
+    }
+
+    function calculateAge(created_at) {
+      const created = new Date(created_at);
+      const now = new Date();
+      const days = Math.floor((now - created) / (1000 * 60 * 60 * 24));
+      
+      if (days === 0) return 'Less than 1 day';
+      if (days === 1) return '1 day';
+      return `${days} days`;
+    }
+
+    // Load deceased knights on page load
+    loadDeceasedKnights();
+  </script>
+</body>
+</html>

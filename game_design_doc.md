@@ -41,16 +41,18 @@ There are four knight classes, each with distinct visual representation:
 ### Equipment System
 
 #### Equipment Slots
-Each knight has 9 equipment slots:
-1. Helm
-2. Chest
-3. Cape
-4. Belt
-5. Gloves
-6. Pants
-7. Boots
-8. Ring (slot 1)
-9. Ring (slot 2)
+Each knight has 11 equipment slots:
+1. Weapon
+2. Shield
+3. Helm
+4. Chest
+5. Cape
+6. Belt
+7. Gloves
+8. Pants
+9. Boots
+10. Ring (slot 1)
+11. Ring (slot 2)
 
 #### Equipment Effects
 - Equipment modifies knight stats
@@ -82,8 +84,17 @@ Each knight has 9 equipment slots:
 ### Monster Selection
 - Monsters are selected based on difficulty tier
 - Selection is semi-random within the tier
-- **Easy Tier (Initial Implementation)**:
+- **Easy Tier**:
   - Level 1 Slime (starter monster)
+  - Giant Rat
+  - Weak Goblin
+- **Medium Tier**:
+  - Forest Wolf
+  - Goblin Warrior
+  - Troglodite
+- **Hard Tier**:
+  - Orc
+  - Giant Spider
 
 ### Combat Mechanics
 
@@ -138,13 +149,39 @@ Minimum Damage = 1 (attacks always do at least 1 damage)
 - Better equipment from harder difficulties
 - Equipment must be manually equipped by player
 
+#### Equipment Tiers
+1. **Wooden Tier** (Easy monsters):
+   - Wooden Sword, Wooden Shield, Wooden Helmet, Wooden Chest Armor, Wooden Gloves, Wooden Pants, Wooden Boots, Wooden Ring
+   - Low stat bonuses
+   
+2. **Stone Tier** (Medium monsters):
+   - Stone Axe, Stone Shield, Stone Helmet, Stone Chest Armor, Stone Gloves, Stone Pants, Stone Boots
+   - Medium stat bonuses
+   
+3. **Iron Tier** (Hard monsters):
+   - Iron Sword, Iron Axe, Iron Shield, Iron Helmet, Iron Chest Armor, Iron Gloves, Iron Pants, Iron Boots
+   - High stat bonuses
+   
+4. **Special/Epic Items**:
+   - Silk Cape (dropped by Giant Spider): +2 defense, +2 agility
+   - Additional epic items to be added
+
+#### Materials
+- Spider Silk: Rare material dropped by Giant Spider (70% drop rate)
+- Used for future crafting system
+
 ## Technical Architecture
 
 ### Frontend (webui)
-- **index.html**: Login and account creation
-- **dashboard.html**: List of user's knights, knight creation
-- **knight.html**: Individual knight detail page with equipment, stats, and battle button
-- **Images**: SVG images for each knight class (160x160 pixels)
+- **index.html**: Login and account creation with medieval theme (castle background, shield emblems)
+- **dashboard.html**: List of user's knights, knight creation, leaderboard, graveyard link
+- **knight.html**: Individual knight detail page with equipment, stats, inventory, battle button, and shop
+- **graveyard.html**: Memorial page for deceased knights with dark/greyscale theme
+- **Images**: 
+  - SVG class icons for each knight class (160x160 pixels)
+  - Monster graphics (256x256 pixels): Level 1 Slime, Giant Rat, Weak Goblin, Forest Wolf, Goblin Warrior, Troglodite, Orc, Giant Spider
+  - Equipment icons (64x64 for materials, 128x128 for armor/weapons)
+  - UI elements: Castle background, shield emblems, decorative banners
 
 ### Backend (Python Flask)
 - **Authentication endpoints**: `/api/login`, `/api/signup`
@@ -158,10 +195,9 @@ Minimum Damage = 1 (attacks always do at least 1 damage)
 
 ### Database (MySQL)
 - **users table**: User accounts (id, username, password_hash, created_at)
-- **knights table**: Knight data (id, user_id, name, class, level, created_at, updated_at)
-- **equipment table** (to be implemented): Equipment items
-- **knight_equipment table** (to be implemented): Equipped items per knight
-- **battles table** (to be implemented): Battle history and results
+- **knights table**: Knight data (id, user_id, name, class, level, hp, max_hp, exp, created_at, updated_at, is_alive)
+- **inventory table**: All items owned by knights (id, knight_id, item_id, quantity, is_equipped)
+- **battles table**: Battle history and results (id, knight_id, monster_name, difficulty, outcome, hp_before, hp_after, exp_gained, gold_gained, battle_log, created_at)
 
 ### Deployment
 - Containerized with Docker
@@ -170,37 +206,78 @@ Minimum Damage = 1 (attacks always do at least 1 damage)
 - Backend: Flask API server
 - Database: MySQL StatefulSet with persistent storage
 
+## UI/UX Design
+
+### Medieval Theme
+- Dark color scheme with brown/tan accents (#2d3748, #1a202c backgrounds)
+- Golden text for titles and highlights (#FFD700)
+- Brown borders and medieval styling (#8B7355)
+- Georgia serif font for authentic medieval feel
+- Castle silhouette backgrounds (semi-transparent overlays)
+- Shield emblems and decorative elements
+- Equipment displayed in 3-column grid for visibility
+
+### Visual Feedback
+- Hover effects on interactive elements
+- Modal dialogs for equipment selection and battle difficulty
+- Click-outside-to-close functionality on modals
+- HP bars with regeneration timers
+- Experience bars showing progress to next level
+- Rarity-based item coloring (common, uncommon, rare, epic)
+
 ## Future Enhancements
-- Additional monster types and difficulty tiers
-- Equipment crafting and enhancement
+- Equipment crafting system using materials (Spider Silk, etc.)
 - Knight skill trees and abilities
 - Multiplayer features (PvP, guilds)
 - Quest system with storylines
-- Leaderboards and achievements
+- Leaderboard enhancements (filtering, pagination)
+- Achievement system
+- More epic/legendary items with unique effects
 
 ---
 
 ## Current Implementation Status
 
 ### ✅ Completed
-- User authentication (login/signup)
+- User authentication (login/signup) with bcrypt password hashing
 - Knight creation with class selection
-- Knight listing on dashboard
-- Knight detail page with equipment slots, stats, HP bar
+- Knight listing on dashboard with leaderboard
+- Knight detail page with equipment slots, stats, HP bar, inventory, and shop
 - Level 10 requirement for creating additional knights
 - Class-specific images for all 4 classes
-- Database schema for users and knights
+- Database schema for users, knights, inventory, and battles
+- Full battle system with all three difficulty tiers
+- HP regeneration system (1 HP per 15 minutes via Kubernetes CronJob)
+- Experience and leveling system (level cap: 10)
+- Equipment system with 11 slots (weapon, shield, helm, chest, cape, belt, gloves, pants, boots, 2 rings)
+- Monster roster: 8 monsters across 3 difficulty tiers
+  - Easy: Level 1 Slime, Giant Rat, Weak Goblin
+  - Medium: Forest Wolf, Goblin Warrior, Troglodite
+  - Hard: Orc, Giant Spider
+- Equipment tiers: Wooden (easy), Stone (medium), Iron (hard)
+- Special items: Silk Cape (epic cape from Giant Spider)
+- Materials system: Spider Silk (crafting material)
+- Battle history and detailed battle logs
+- Graveyard page for deceased knights
+- Medieval-themed UI with castle backgrounds, shield emblems, golden accents
+- Shop system for purchasing equipment with gold
+- Inventory management with equip/unequip functionality
+- Equipment slots clickable with filtered item selection
+- Sell duplicate equipment feature
 
 ### 🚧 In Progress
-- Battle system (Easy difficulty, Level 1 Slime)
-- HP regeneration system (1 HP per 15 minutes)
+- Monster graphics refinement (currently using SVG placeholders)
+- Equipment icon improvements
 
 ### 📋 Planned
-- Equipment system and item drops
-- Experience and leveling mechanics
-- Battle history and logs
-- Medium and Hard difficulty monsters
-- Additional monster varieties
+- Crafting system using materials (Spider Silk → items)
+- Additional epic/legendary items with unique effects
+- More monster varieties within each tier
+- Knight skill trees and special abilities
+- PvP battle system
+- Guild/clan system
+- Quest and storyline system
+- Achievement system with rewards
 
 ---
 

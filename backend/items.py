@@ -6,7 +6,7 @@ ITEMS = {
         "name": "Slime Residue",
         "type": "material",
         "stackable": True,
-        "description": "Gooey residue (Not Kombucha)",
+        # "description": "Gooey residue (Not Kombucha)",
         "rarity": "common"
     },
     
@@ -17,7 +17,7 @@ ITEMS = {
         "stackable": False,
         "slot": "weapon",
         "stats": {"attack": 5},
-        "description": "A basic wooden sword (Actually just a stick)",
+        # "description": "A basic wooden sword (Actually just a stick)",
         "rarity": "uncommon"
     },
     202: {
@@ -26,7 +26,7 @@ ITEMS = {
         "stackable": False,
         "slot": "shield",
         "stats": {"defense": 3},
-        "description": "A simple wooden shield. (looks fragile, is fragile)",
+        # "description": "A simple wooden shield. (looks fragile, is fragile)",
         "rarity": "uncommon"
     },
     203: {
@@ -35,7 +35,7 @@ ITEMS = {
         "stackable": False,
         "slot": "helm",
         "stats": {"defense": 2},
-        "description": "A crude wooden helmet (splinters included)",
+        # "description": "A crude wooden helmet (splinters included)",
         "rarity": "uncommon"
     },
     204: {
@@ -44,7 +44,7 @@ ITEMS = {
         "stackable": False,
         "slot": "chest",
         "stats": {"defense": 4},
-        "description": "Wooden planks strapped together as armor (step aside macgyver)",
+        # "description": "Wooden planks strapped together as armor (step aside macgyver)",
         "rarity": "uncommon"
     },
     205: {
@@ -53,7 +53,7 @@ ITEMS = {
         "stackable": False,
         "slot": "pants",
         "stats": {"defense": 3},
-        "description": "Wooden leg armor (what? you want me to stand inside this wooden box?)",
+        # "description": "Wooden leg armor (what? you want me to stand inside this wooden box?)",
         "rarity": "uncommon"
     },
     206: {
@@ -62,7 +62,7 @@ ITEMS = {
         "stackable": False,
         "slot": "weapon",
         "stats": {"attack": 4, "agility": 2},
-        "description": "A crude wooden bow (arrows sold separately)",
+        # "description": "A crude wooden bow (arrows sold separately)",
         "rarity": "uncommon"
     },
     207: {
@@ -71,7 +71,7 @@ ITEMS = {
         "stackable": False,
         "slot": "weapon",
         "stats": {"attack": 3, "defense": 2},
-        "description": "A sturdy walking staff (bonk)",
+        # "description": "A sturdy walking staff (bonk)",
         "rarity": "uncommon"
     },
     208: {
@@ -80,7 +80,7 @@ ITEMS = {
         "stackable": False,
         "slot": "weapon",
         "stats": {"attack": 3, "agility": 3},
-        "description": "A small wooden blade (one single big single sliver)",
+        # "description": "A small wooden blade (one single big single sliver)",
         "rarity": "uncommon"
     },
     
@@ -91,7 +91,7 @@ ITEMS = {
         "stackable": False,
         "slot": "weapon",
         "stats": {"attack": 10},
-        "description": "A heavy stone blade (your enemies will feel the weight)",
+        # "description": "A heavy stone blade (your enemies will feel the weight)",
         "rarity": "rare"
     },
     302: {
@@ -100,7 +100,7 @@ ITEMS = {
         "stackable": False,
         "slot": "weapon",
         "stats": {"attack": 12, "defense": -2},
-        "description": "A brutal stone axe (its a rock)",
+        # "description": "A brutal stone axe (its a rock)",
         "rarity": "rare"
     },
     303: {
@@ -109,7 +109,7 @@ ITEMS = {
         "stackable": False,
         "slot": "shield",
         "stats": {"defense": 7, "agility": -1},
-        "description": "A solid stone shield (heavy)",
+        # "description": "A solid stone shield (heavy)",
         "rarity": "rare"
     },
     304: {
@@ -118,7 +118,7 @@ ITEMS = {
         "stackable": False,
         "slot": "helm",
         "stats": {"defense": 5, "agility": -1},
-        "description": "A stone helmet (you're balancing a rock on your head)",
+        # "description": "A stone helmet (you're balancing a rock on your head)",
         "rarity": "rare"
     },
     305: {
@@ -127,7 +127,7 @@ ITEMS = {
         "stackable": False,
         "slot": "chest",
         "stats": {"defense": 8, "agility": -2},
-        "description": "Stone plates protecting your vital organs (not chiropractor recommended)",
+        # "description": "Stone plates protecting your vital organs (not chiropractor recommended)",
         "rarity": "rare"
     },
     
@@ -138,7 +138,7 @@ ITEMS = {
         "stackable": False,
         "slot": "weapon",
         "stats": {"attack": 18},
-        "description": "A well-forged iron blade (you called this well forged?)",
+        # "description": "A well-forged iron blade (you called this well forged?)",
         "rarity": "epic"
     },
     402: {
@@ -147,7 +147,7 @@ ITEMS = {
         "stackable": False,
         "slot": "weapon",
         "stats": {"attack": 20, "defense": -1},
-        "description": "A brutal iron axe (blunt as)",
+        # "description": "A brutal iron axe (blunt as)",
         "rarity": "epic"
     },
     403: {
@@ -156,7 +156,7 @@ ITEMS = {
         "stackable": False,
         "slot": "shield",
         "stats": {"defense": 12, "agility": -2},
-        "description": "A sturdy iron shield (built to last (thats what she said))",
+        # "description": "A sturdy iron shield (built to last (thats what she said))",
         "rarity": "epic"
     },
     404: {
@@ -165,7 +165,7 @@ ITEMS = {
         "stackable": False,
         "slot": "helm",
         "stats": {"defense": 9},
-        "description": "An iron helmet (proper head protection(thats what she said))",
+        # "description": "An iron helmet (proper head protection(thats what she said))",
         "rarity": "epic"
     },
     405: {
@@ -174,7 +174,7 @@ ITEMS = {
         "stackable": False,
         "slot": "chest",
         "stats": {"defense": 14, "agility": -2},
-        "description": "Iron plates forged into proper armor (you've played rpgs before)",
+        # "description": "Iron plates forged into proper armor (you've played rpgs before)",
         "rarity": "epic"
     },
     406: {
@@ -183,7 +183,16 @@ ITEMS = {
         "stackable": False,
         "slot": "pants",
         "stats": {"defense": 10, "agility": -2},
-        "description": "Iron leg armor (left clank right clank left clank...)",
+        # "description": "Iron leg armor (left clank right clank left clank...)",
+        "rarity": "epic"
+    },
+    410: {
+        "name": "Silk Cape",
+        "type": "armor",
+        "stackable": False,
+        "slot": "cape",
+        "stats": {"defense": 2, "agility": 2},
+        # "description": "A lightweight cape made of spider silk (surprisingly stylish)",
         "rarity": "epic"
     },
     
@@ -192,21 +201,28 @@ ITEMS = {
         "name": "Goblin Ear",
         "type": "material",
         "stackable": True,
-        "description": "A goblin's ear (eww, but valuable)",
+        # "description": "A goblin's ear (eww, but valuable)",
         "rarity": "common"
     },
     103: {
         "name": "Wolf Fang",
         "type": "material",
         "stackable": True,
-        "description": "A sharp wolf fang (could make a nice necklace)",
+        # "description": "A sharp wolf fang (could make a nice necklace)",
         "rarity": "common"
     },
     104: {
         "name": "Orc Tusk",
         "type": "material",
         "stackable": True,
-        "description": "A massive orc tusk (worth a fortune)",
+        # "description": "A massive orc tusk (worth a fortune)",
+        "rarity": "rare"
+    },
+    105: {
+        "name": "Spider Silk",
+        "type": "material",
+        "stackable": True,
+        # "description": "Fine silk from a giant spider (lightweight and strong)",
         "rarity": "rare"
     },
     
@@ -215,7 +231,7 @@ ITEMS = {
         "name": "HP Potion",
         "type": "consumable",
         "stackable": True,
-        "description": "Restores 25 HP when consumed",
+        # "description": "Restores 25 HP when consumed",
         "rarity": "common",
         "effect": {"type": "heal", "amount": 25}
     },

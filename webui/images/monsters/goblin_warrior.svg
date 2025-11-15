@@ -1,0 +1,35 @@
+<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" fill="none"/>
+  <defs>
+    <style>
+      text { font-family: Arial; font-size: 24px; fill: #FFF; text-anchor: middle; }
+    </style>
+  </defs>
+  
+  <!-- Goblin Warrior Body -->
+  <ellipse cx="128" cy="180" rx="35" ry="15" fill="#2d5016"/>
+  <rect x="100" y="140" width="56" height="40" fill="#4a7c2e" stroke="#000" stroke-width="3"/>
+  <circle cx="128" cy="100" r="30" fill="#6b9e3e" stroke="#000" stroke-width="3"/>
+  
+  <!-- Armor -->
+  <rect x="105" y="145" width="46" height="30" fill="#654321" stroke="#000" stroke-width="2"/>
+  
+  <!-- Arms -->
+  <rect x="75" y="150" width="20" height="35" fill="#6b9e3e" stroke="#000" stroke-width="2"/>
+  <rect x="161" y="150" width="20" height="35" fill="#6b9e3e" stroke="#000" stroke-width="2"/>
+  
+  <!-- Weapon (club) -->
+  <rect x="180" y="130" width="12" height="60" fill="#8B4513" stroke="#000" stroke-width="2"/>
+  <circle cx="186" cy="125" r="15" fill="#654321" stroke="#000" stroke-width="2"/>
+  
+  <!-- Face -->
+  <circle cx="118" cy="95" r="5" fill="#000"/>
+  <circle cx="138" cy="95" r="5" fill="#000"/>
+  <path d="M115 110 Q128 115 141 110" stroke="#000" stroke-width="2" fill="none"/>
+  
+  <!-- Ears -->
+  <ellipse cx="95" cy="100" rx="8" ry="15" fill="#6b9e3e" stroke="#000" stroke-width="2"/>
+  <ellipse cx="161" cy="100" rx="8" ry="15" fill="#6b9e3e" stroke="#000" stroke-width="2"/>
+  
+  <text x="128" y="240">GOBLIN WARRIOR</text>
+</svg>

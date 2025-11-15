@@ -1,0 +1,49 @@
+<svg width="256" height="256" xmlns="http://www.w3.org/2000/svg">
+  <rect width="256" height="256" fill="none"/>
+  <defs>
+    <style>
+      text { font-family: Arial; font-size: 28px; fill: #FFF; text-anchor: middle; font-weight: bold; }
+    </style>
+  </defs>
+  
+  <!-- Orc Body (large, imposing) -->
+  <ellipse cx="128" cy="200" rx="50" ry="20" fill="#2d4d2d"/>
+  <rect x="85" y="130" width="86" height="70" fill="#3d5d3d" stroke="#000" stroke-width="3"/>
+  <ellipse cx="128" cy="85" rx="40" ry="45" fill="#4a6b4a" stroke="#000" stroke-width="3"/>
+  
+  <!-- Black armor plates -->
+  <rect x="90" y="135" width="76" height="25" fill="#1a1a1a" stroke="#2F4F4F" stroke-width="2"/>
+  <rect x="95" y="165" width="66" height="20" fill="#1a1a1a" stroke="#2F4F4F" stroke-width="2"/>
+  
+  <!-- Armor studs -->
+  <circle cx="105" cy="147" r="3" fill="#708090"/>
+  <circle cx="128" cy="147" r="3" fill="#708090"/>
+  <circle cx="151" cy="147" r="3" fill="#708090"/>
+  
+  <!-- Muscular arms -->
+  <rect x="60" y="145" width="25" height="50" fill="#4a6b4a" stroke="#000" stroke-width="3"/>
+  <rect x="171" y="145" width="25" height="50" fill="#4a6b4a" stroke="#000" stroke-width="3"/>
+  
+  <!-- Large weapon (battle axe) -->
+  <rect x="195" y="100" width="15" height="80" fill="#654321" stroke="#000" stroke-width="2"/>
+  <path d="M195 95 L230 90 L230 110 L200 105 Z" fill="#708090" stroke="#000" stroke-width="2"/>
+  <path d="M195 105 L230 110 L230 130 L200 125 Z" fill="#708090" stroke="#000" stroke-width="2"/>
+  
+  <!-- Orc face (menacing) -->
+  <circle cx="115" cy="80" r="7" fill="#8B0000" stroke="#000" stroke-width="2"/>
+  <circle cx="141" cy="80" r="7" fill="#8B0000" stroke="#000" stroke-width="2"/>
+  <circle cx="116" cy="80" r="3" fill="#000"/>
+  <circle cx="140" cy="80" r="3" fill="#000"/>
+  
+  <!-- Tusks -->
+  <path d="M110 100 L105 115 L112 105 Z" fill="#F5DEB3" stroke="#000" stroke-width="2"/>
+  <path d="M146 100 L151 115 L144 105 Z" fill="#F5DEB3" stroke="#000" stroke-width="2"/>
+  
+  <!-- Scar -->
+  <path d="M135 70 L145 85" stroke="#8B0000" stroke-width="2"/>
+  
+  <!-- Angry mouth -->
+  <path d="M115 105 Q128 110 141 105" stroke="#000" stroke-width="3" fill="none"/>
+  
+  <text x="128" y="245">ORC</text>
+</svg>

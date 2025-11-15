@@ -1,0 +1,6 @@
+<svg width="64" height="64" xmlns="http://www.w3.org/2000/svg">
+  <rect width="64" height="64" fill="#1a1a1a"/>
+  <path d="M20 35 Q24 18 32 20 Q38 25 36 35 Q32 40 28 38 Z" fill="#F5DEB3" stroke="#000" stroke-width="2"/>
+  <line x1="28" y1="25" x2="30" y2="22" stroke="#8B4513" stroke-width="1"/>
+  <text x="32" y="50" font-family="Arial" font-size="6" fill="#FFF" text-anchor="middle">ORC</text>
+</svg>

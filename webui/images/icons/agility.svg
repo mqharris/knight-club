@@ -1,0 +1,6 @@
+<svg width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+  <path d="M8 18 L12 10 L16 12 L12 20 Z" fill="#8B4513" stroke="#000" stroke-width="2"/>
+  <ellipse cx="14" cy="22" rx="4" ry="2" fill="#654321" stroke="#000" stroke-width="1"/>
+  <path d="M18 10 L22 8 L24 12 L20 14 Z" fill="#FFD700" stroke="#000" stroke-width="1"/>
+  <text x="20" y="24" font-family="Arial" font-size="8" fill="#FFD700">⚡</text>
+</svg>
