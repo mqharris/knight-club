@@ -980,7 +980,8 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            inventory_id: inventoryId
+            inventory_id: inventoryId,
+            user_id: parseInt(user.user_id)
           })
         });
         const data = await response.json();
