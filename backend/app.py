@@ -396,10 +396,68 @@ def equip_item(knight_id):
         """, (inventory_id,))
         
         conn.commit()
+        
+        # Return updated knight data
+        cursor.execute(
+            "SELECT id, user_id, name, class, level, exp, current_hp, max_hp, is_alive, created_at FROM knights WHERE id = %s",
+            (knight_id,)
+        )
+        knight = cursor.fetchone()
+        
+        # Get equipped items
+        cursor.execute("""
+            SELECT i.id, i.item_id, i.quantity
+            FROM inventory i
+            WHERE i.knight_id = %s AND i.is_equipped = TRUE
+        """, (knight_id,))
+        
+        equipped_items = cursor.fetchall()
+        
+        # Get ALL inventory items
+        cursor.execute("""
+            SELECT i.id, i.item_id, i.quantity, i.is_equipped
+            FROM inventory i
+            WHERE i.knight_id = %s
+        """, (knight_id,))
+        
+        all_items = cursor.fetchall()
         cursor.close()
         conn.close()
         
-        return jsonify({'message': 'Item equipped successfully'}), 200
+        # Enrich equipped items with definitions
+        equipment = []
+        for item in equipped_items:
+            item_def = get_item(item['item_id'])
+            if item_def:
+                equipment.append({
+                    'inventory_id': item['id'],
+                    'item_id': item['item_id'],
+                    'name': item_def['name'],
+                    'slot': item_def.get('slot'),
+                    'stats': item_def.get('stats', {}),
+                    'type': item_def['type']
+                })
+        
+        # Enrich all inventory items
+        inventory = []
+        for item in all_items:
+            item_def = get_item(item['item_id'])
+            if item_def:
+                inventory.append({
+                    'inventory_id': item['id'],
+                    'item_id': item['item_id'],
+                    'name': item_def['name'],
+                    'slot': item_def.get('slot'),
+                    'stats': item_def.get('stats', {}),
+                    'type': item_def['type'],
+                    'quantity': item['quantity'],
+                    'is_equipped': item['is_equipped']
+                })
+        
+        knight['equipment'] = equipment
+        knight['inventory'] = inventory
+        
+        return jsonify({'knight': knight}), 200
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
