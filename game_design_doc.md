@@ -124,12 +124,10 @@ Minimum Damage = 1 (attacks always do at least 1 damage)
 - Knight can defeat slime but will need time to heal afterward
 
 ### Battle Results
-- Victory: Knight gains experience, may level up, may receive loot, HP is reduced based on damage taken
-- Defeat: Knight dies permanently (HP goes to 0, is_alive set to false), no experience gained
-- Draw: Both combatants fall - knight dies permanently
+- Victory: Knight gains experience, may level up, may receive loot
+- Defeat: Knight loses HP (cannot go below 1 HP), no experience gained
 - Battle log shows turn-by-turn actions
 - Results are saved to database
-- Dead knights are moved to the graveyard
 
 ### Battle Processing
 - Battles run as Kubernetes Jobs

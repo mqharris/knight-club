@@ -976,6 +976,7 @@
 
     async function equipItemFromSelection(inventoryId) {
       try {
+        console.log('Equipping item:', inventoryId);
         const response = await fetch(`/api/knights/${knightId}/equip`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -984,7 +985,9 @@
             user_id: parseInt(user.user_id)
           })
         });
+        console.log('Response status:', response.status);
         const data = await response.json();
+        console.log('Response data:', data);
         
         if (response.ok) {
           knightData = data.knight;
@@ -995,6 +998,7 @@
           alert(data.error || 'Failed to equip item');
         }
       } catch (error) {
+        console.error('Error equipping item:', error);
         alert('Connection error. Please try again.');
       }
     }
