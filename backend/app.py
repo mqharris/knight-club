@@ -221,6 +221,15 @@ def get_knight(knight_id):
         """, (knight_id,))
         
         equipped_items = cursor.fetchall()
+        
+        # Get ALL inventory items
+        cursor.execute("""
+            SELECT i.id, i.item_id, i.quantity, i.is_equipped
+            FROM inventory i
+            WHERE i.knight_id = %s
+        """, (knight_id,))
+        
+        all_items = cursor.fetchall()
         cursor.close()
         conn.close()
         
@@ -238,7 +247,24 @@ def get_knight(knight_id):
                     'type': item_def['type']
                 })
         
+        # Enrich all inventory items
+        inventory = []
+        for item in all_items:
+            item_def = get_item(item['item_id'])
+            if item_def:
+                inventory.append({
+                    'inventory_id': item['id'],
+                    'item_id': item['item_id'],
+                    'name': item_def['name'],
+                    'slot': item_def.get('slot'),
+                    'stats': item_def.get('stats', {}),
+                    'type': item_def['type'],
+                    'quantity': item['quantity'],
+                    'is_equipped': item['is_equipped']
+                })
+        
         knight['equipment'] = equipment
+        knight['inventory'] = inventory
         
         return jsonify({'knight': knight}), 200
     except Exception as e:

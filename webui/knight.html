@@ -571,14 +571,16 @@
         }
       }).join('');
       
-      // Add click event listeners to all equipment slots
-      equipmentSlots.forEach((slot, index) => {
-        const slotId = `slot-${slot}-${index}`;
-        const element = document.getElementById(slotId);
-        if (element) {
-          element.addEventListener('click', () => openEquipmentSelection(slot));
-        }
-      });
+      // Add click event listeners to all equipment slots after a short delay to ensure DOM is ready
+      setTimeout(() => {
+        equipmentSlots.forEach((slot, index) => {
+          const slotId = `slot-${slot}-${index}`;
+          const element = document.getElementById(slotId);
+          if (element) {
+            element.onclick = () => openEquipmentSelection(slot);
+          }
+        });
+      }, 0);
     }
 
     function displayStats() {
